@@ -1,23 +1,44 @@
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Haptics from 'expo-haptics';
 import { Tabs, usePathname, useRouter, type Href } from 'expo-router';
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+
+type TabIcon =
+  | {
+      family: 'material';
+      name: ComponentProps<typeof MaterialIcons>['name'];
+    }
+  | {
+      family: 'community';
+      name: ComponentProps<typeof MaterialCommunityIcons>['name'];
+    };
 
 type TabConfig = {
   key: string;
   title: string;
   href: Href;
-  icon: 'house.fill' | 'paperplane.fill';
+  icon: TabIcon;
 };
 
 const TAB_CONFIG: readonly TabConfig[] = [
-  { key: 'home', title: 'Home', href: '/', icon: 'house.fill' },
-  { key: 'explore', title: 'Explore', href: '/explore', icon: 'paperplane.fill' },
+  {
+    key: 'home',
+    title: 'Home',
+    href: '/',
+    icon: { family: 'community', name: 'alphabetical-variant' },
+  },
+  {
+    key: 'explore',
+    title: 'Explore',
+    href: '/explore',
+    icon: { family: 'material', name: 'send' },
+  },
 ];
 
 const COMPACT_BREAKPOINT = 768;
@@ -112,11 +133,19 @@ function Sidebar({ width }: SidebarProps) {
               !isFocused && pressed && { backgroundColor: pressedBackground },
             ]}
           >
-            <IconSymbol
-              size={28}
-              name={tab.icon}
-              color={isFocused ? palette.background : palette.icon}
-            />
+            {tab.icon.family === 'community' ? (
+              <MaterialCommunityIcons
+                size={28}
+                name={tab.icon.name}
+                color={isFocused ? palette.background : palette.icon}
+              />
+            ) : (
+              <MaterialIcons
+                size={28}
+                name={tab.icon.name}
+                color={isFocused ? palette.background : palette.icon}
+              />
+            )}
             <Text
               style={[
                 styles.label,
