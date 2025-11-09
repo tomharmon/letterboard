@@ -34,10 +34,28 @@ const TAB_CONFIG: readonly TabConfig[] = [
     icon: { family: 'community', name: 'alphabetical-variant' },
   },
   {
-    key: 'explore',
-    title: 'Explore',
-    href: '/explore',
-    icon: { family: 'material', name: 'send' },
+    key: 'choice-board',
+    title: 'Choice board',
+    href: '/choice-board',
+    icon: { family: 'community', name: 'checkbox-multiple-outline' },
+  },
+  {
+    key: 'emoji-board',
+    title: 'Emoji board',
+    href: '/emoji-board',
+    icon: { family: 'community', name: 'emoticon-outline' },
+  },
+  {
+    key: 'settings',
+    title: 'Settings',
+    href: '/settings',
+    icon: { family: 'community', name: 'cog-outline' },
+  },
+  {
+    key: 'help',
+    title: 'Help',
+    href: '/help',
+    icon: { family: 'community', name: 'help-circle-outline' },
   },
 ];
 
@@ -64,13 +82,31 @@ export default function TabLayout() {
           <Tabs.Screen
             name="index"
             options={{
-              title: 'Home',
+              title: 'Letterboard',
             }}
           />
           <Tabs.Screen
-            name="explore"
+            name="choice-board"
             options={{
-              title: 'Explore',
+              title: 'Choice board',
+            }}
+          />
+          <Tabs.Screen
+            name="emoji-board"
+            options={{
+              title: 'Emoji board',
+            }}
+          />
+          <Tabs.Screen
+            name="settings"
+            options={{
+              title: 'Settings',
+            }}
+          />
+          <Tabs.Screen
+            name="help"
+            options={{
+              title: 'Help',
             }}
           />
         </Tabs>
