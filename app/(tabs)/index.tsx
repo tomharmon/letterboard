@@ -1,98 +1,415 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { useCallback, useMemo, useState, type ComponentProps } from 'react';
+import {
+  Alert,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+
+const COLUMNS = 6;
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const colorScheme = useColorScheme();
+  const palette = Colors[colorScheme ?? 'light'];
+  const [text, setText] = useState('');
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const letterRows = useMemo(() => {
+    // Desired layout:
+    // - 6 columns total
+    // - Rows 1–5: fill columns 1–5 with A–Y, column 6 empty
+    // - Row 6: columns 1–5 empty, column 6 = Z
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const rows: Array<Array<string | null>> = Array.from({ length: 6 }, () =>
+      Array(COLUMNS).fill(null),
+    );
+
+    let index = 0;
+    for (let r = 0; r < 5; r++) {
+      for (let c = 0; c < 5; c++) {
+        rows[r][c] = alphabet[index++];
+      }
+      // rows[r][5] remains null to create the empty vertical column
+    }
+    // Place Z in the bottom-right cell
+    rows[5][5] = alphabet[index] ?? null;
+
+    return rows;
+  }, []);
+
+  const words = useMemo(() => {
+    if (!text.trim()) {
+      return [];
+    }
+
+    return text.split(' ');
+  }, [text]);
+
+  const handleLetterClick = useCallback((letter: string) => {
+    setText((prev) => prev + letter);
+  }, []);
+
+  const handleBackspace = useCallback(() => {
+    setText((prev) => prev.slice(0, -1));
+  }, []);
+
+  const handleClear = useCallback(() => {
+    setText('');
+  }, []);
+
+  const handleSpeak = useCallback(() => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text || 'Nothing to say yet');
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+      return;
+    }
+
+    Alert.alert('Speech unavailable', 'Speech playback is only supported on web right now.');
+  }, [text]);
+
+  const timestampColor = colorScheme === 'dark' ? '#a1a1aa' : '#6b7280';
+  const mutedText = colorScheme === 'dark' ? '#d4d4d8' : '#6b7280';
+  const neutralSurface = colorScheme === 'dark' ? '#1f2937' : '#f3f4f6';
+  const destructiveSurface = colorScheme === 'dark' ? '#4b5563' : '#4b5563';
+  const destructiveIcon = '#ffffff';
+  const dividerColor = colorScheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)';
+  const keyboardBackground = '#18181b';
+  const keyDefault = '#27272a';
+  const keyPressed = '#3f3f46';
+
+  return (
+    <SafeAreaView
+      style={[
+        styles.safeArea,
+        { backgroundColor: colorScheme === 'dark' ? '#111827' : '#f3f4f6' },
+      ]}
+      edges={['top', 'left', 'right']}
+    >
+      <View style={styles.container}>
+        <View
+          style={[
+            styles.header,
+            { backgroundColor: palette.background, borderBottomColor: dividerColor },
+          ]}
+        >
+          <View style={styles.headerLeft}>
+            <IconButton
+              name="menu"
+              iconColor={palette.text}
+              accessibilityLabel="Open menu"
+              containerStyle={styles.iconButtonSmall}
+            />
+            <Text style={[styles.timestamp, { color: timestampColor }]}>5:41PM Sat Nov 8</Text>
+          </View>
+          <Text style={[styles.title, { color: palette.text }]}>Letterboard</Text>
+        </View>
+
+        <View
+          style={[
+            styles.displayRow,
+            { backgroundColor: palette.background, borderBottomColor: dividerColor },
+          ]}
+        >
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Speak out loud"
+            onPress={handleSpeak}
+            style={({ pressed }) => [
+              styles.iconButton,
+              styles.iconButtonLarge,
+              { backgroundColor: neutralSurface },
+              pressed && styles.pressed,
+            ]}
+          >
+            <MaterialCommunityIcons name="volume-high" size={28} color={palette.text} />
+          </Pressable>
+
+          <View style={styles.textContainer}>
+            {words.length === 0 ? (
+              <Text style={[styles.placeholderText, { color: mutedText }]}>
+                Tap letters to start building a message.
+              </Text>
+            ) : (
+              <Text
+                style={[styles.displayText, { color: palette.text }]}
+                numberOfLines={2}
+                adjustsFontSizeToFit
+                minimumFontScale={0.5}
+              >
+                {words.map((word, idx) => {
+                  const isBirthday = word.toUpperCase() === 'BIRTHDAY';
+                  const trailingSpace = idx < words.length - 1 ? ' ' : '';
+                  return (
+                    <Text
+                      key={`${word}-${idx}`}
+                      style={isBirthday ? styles.highlightedWord : undefined}
+                    >
+                      {word}
+                      {trailingSpace}
+                    </Text>
+                  );
+                })}
+              </Text>
+            )}
+          </View>
+
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Clear message"
+            onPress={handleClear}
+            style={({ pressed }) => [
+              styles.iconButton,
+              styles.iconButtonLarge,
+              { backgroundColor: destructiveSurface },
+              pressed && styles.pressed,
+            ]}
+          >
+            <MaterialCommunityIcons name="close" size={28} color={destructiveIcon} />
+          </Pressable>
+        </View>
+
+        <View
+          style={[
+            styles.keyboardWrapper,
+            { backgroundColor: keyboardBackground, borderTopColor: dividerColor },
+          ]}
+        >
+          <View style={styles.keyboardInner}>
+            <View style={styles.letterGrid}>
+              {letterRows.map((row, rowIdx) => (
+                <View key={rowIdx} style={styles.letterRow}>
+                  {row.map((letter, colIdx) =>
+                    letter ? (
+                      <Pressable
+                        key={letter}
+                        onPress={() => handleLetterClick(letter)}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Add letter ${letter}`}
+                        style={({ pressed }) => [
+                          styles.letterButton,
+                          { backgroundColor: keyDefault },
+                          pressed && { backgroundColor: keyPressed },
+                        ]}
+                      >
+                        <Text style={styles.letter}>{letter}</Text>
+                      </Pressable>
+                    ) : (
+                      <View
+                        key={`spacer-${rowIdx}-${colIdx}`}
+                        style={[styles.letterButton, { backgroundColor: 'transparent' }]}
+                        pointerEvents="none"
+                        accessibilityElementsHidden
+                        importantForAccessibility="no-hide-descendants"
+                      />
+                    )
+                  )}
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.bottomRow}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Toggle numbers"
+                style={({ pressed }) => [
+                  styles.numberButton,
+                  pressed && styles.pressed,
+                ]}
+                onPress={() => {
+                  // Future enhancement for toggling numeric layout.
+                }}
+              >
+                <Text style={styles.numberButtonText}>123</Text>
+              </Pressable>
+              <View style={styles.spaceBar} accessibilityLabel="Space bar" />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Delete last letter"
+                onPress={handleBackspace}
+                style={({ pressed }) => [
+                  styles.iconButton,
+                  styles.backspaceButton,
+                  pressed && styles.pressed,
+                ]}
+              >
+                <MaterialCommunityIcons name="backspace-outline" size={28} color="#ffffff" />
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+type IconButtonProps = {
+  name: ComponentProps<typeof MaterialCommunityIcons>['name'];
+  iconColor: string;
+  accessibilityLabel: string;
+  containerStyle?: StyleProp<ViewStyle>;
+};
+
+function IconButton({ name, iconColor, accessibilityLabel, containerStyle }: IconButtonProps) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      style={({ pressed }) => [
+        styles.iconButton,
+        containerStyle,
+        pressed && styles.pressed,
+      ]}
+    >
+      <MaterialCommunityIcons name={name} size={28} color={iconColor} />
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  safeArea: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+  },
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  timestamp: {
+    marginLeft: 12,
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+  },
+  displayRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: 12,
+  },
+  textContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  displayText: {
+    fontSize: 34,
+    fontWeight: '700',
+    lineHeight: 42,
+  },
+  placeholderText: {
+    fontSize: 18,
+    fontWeight: '500',
+  },
+  highlightedWord: {
+    color: '#dc2626',
+  },
+  keyboardWrapper: {
+    flex: 1,
+    marginTop: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 10,
+    paddingTop: 8,
+    paddingBottom: 12,
+    overflow: 'hidden',
+  },
+  keyboardInner: {
+    flex: 1,
+    overflow: 'hidden',
+  },
+  letterGrid: {
+    gap: 4,
+  },
+  letterRow: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  letterButton: {
+    flex: 1,
+    height: 56,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 0,
+  },
+  letter: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  bottomRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 4,
     gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  numberButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#3f3f46',
+    backgroundColor: '#27272a',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  numberButtonText: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  spaceBar: {
+    flex: 1,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: '#27272a',
+    borderWidth: 1,
+    borderColor: '#3f3f46',
+  },
+  backspaceButton: {
+    height: 48,
+    width: 48,
+    borderRadius: 12,
+    backgroundColor: '#27272a',
+  },
+  iconButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
+  },
+  iconButtonLarge: {
+    height: 48,
+    width: 48,
+  },
+  iconButtonSmall: {
+    height: 44,
+    width: 44,
+  },
+  pressed: {
+    opacity: 0.7,
   },
 });
