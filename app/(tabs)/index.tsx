@@ -25,22 +25,21 @@ export default function HomeScreen() {
   const letterRows = useMemo(() => {
     // Desired layout:
     // - 6 columns total
-    // - Rows 1–5: fill columns 1–5 with A–Y, column 6 empty
-    // - Row 6: columns 1–5 empty, column 6 = Z
+    // - Rows 1–5 only: fill columns 1–5 with A–Y, column 6 empty except for Z
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    const rows: Array<Array<string | null>> = Array.from({ length: 6 }, () =>
+    const rows: Array<Array<string | null>> = Array.from({ length: 5 }, () =>
       Array(COLUMNS).fill(null),
     );
 
     let index = 0;
-    for (let r = 0; r < 5; r++) {
+    for (let r = 0; r < rows.length; r++) {
       for (let c = 0; c < 5; c++) {
         rows[r][c] = alphabet[index++];
       }
       // rows[r][5] remains null to create the empty vertical column
     }
-    // Place Z in the bottom-right cell
-    rows[5][5] = alphabet[index] ?? null;
+    // Place Z at the end of the fifth row (move up one row)
+    rows[4][5] = alphabet[index] ?? null;
 
     return rows;
   }, []);
