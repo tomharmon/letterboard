@@ -1,10 +1,9 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Speech from '@mhpdev/react-native-speech';
 import { useCallback, useMemo, useRef, useState, type ComponentProps } from 'react';
 import {
-  Alert,
   Animated,
   Easing,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -66,6 +65,10 @@ export default function HomeScreen() {
     setText((prev) => prev.slice(0, -1));
   }, []);
 
+  const handleSpace = useCallback(() => {
+    setText((prev) => prev + ' ');
+  }, []);
+
   const handleClear = useCallback(() => {
     setText('');
   }, []);
@@ -103,14 +106,10 @@ export default function HomeScreen() {
   }, [clearProgress]);
 
   const handleSpeak = useCallback(() => {
-    if (Platform.OS === 'web' && typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text || 'Nothing to say yet');
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-      return;
-    }
-
-    Alert.alert('Speech unavailable', 'Speech playback is only supported on web right now.');
+    const textToSpeak = text || 'Nothing to say yet';
+    Speech.speak(textToSpeak).catch((error) => {
+      console.error('Speech error:', error);
+    });
   }, [text]);
 
   const mutedText = colorScheme === 'dark' ? '#d4d4d8' : '#6b7280';
@@ -271,7 +270,15 @@ export default function HomeScreen() {
               >
                 <Text style={styles.numberButtonText}>123</Text>
               </Pressable>
-              <View style={styles.spaceBar} accessibilityLabel="Space bar" />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Add space"
+                onPress={handleSpace}
+                style={({ pressed }) => [
+                  styles.spaceBar,
+                  pressed && { backgroundColor: keyPressed },
+                ]}
+              />
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Delete last letter"
