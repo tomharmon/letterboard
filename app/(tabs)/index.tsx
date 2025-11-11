@@ -1,7 +1,9 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { useCallback, useMemo, useState, type ComponentProps } from 'react';
+import { useCallback, useMemo, useRef, useState, type ComponentProps } from 'react';
 import {
   Alert,
+  Animated,
+  Easing,
   Platform,
   Pressable,
   StyleSheet,
@@ -21,6 +23,10 @@ export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const palette = Colors[colorScheme ?? 'light'];
   const [text, setText] = useState('');
+  const clearHoldMs = 1000;
+  const clearProgress = useRef(new Animated.Value(0)).current;
+  const clearAnimationRef = useRef<Animated.CompositeAnimation | null>(null);
+  const [clearTrackHeight, setClearTrackHeight] = useState(0);
 
   const letterRows = useMemo(() => {
     // Desired layout:
@@ -63,6 +69,38 @@ export default function HomeScreen() {
   const handleClear = useCallback(() => {
     setText('');
   }, []);
+
+  const handleClearPressIn = useCallback(() => {
+    // Start progress animation towards completion
+    clearAnimationRef.current?.stop();
+    clearAnimationRef.current = Animated.timing(clearProgress, {
+      toValue: 1,
+      duration: clearHoldMs,
+      easing: Easing.linear,
+      useNativeDriver: false, // animates width
+    });
+    clearAnimationRef.current.start(({ finished }) => {
+      if (finished) {
+        // Only clear if the hold completed
+        handleClear();
+        Animated.timing(clearProgress, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver: false,
+        }).start();
+      }
+    });
+  }, [clearHoldMs, clearProgress, handleClear]);
+
+  const handleClearPressOut = useCallback(() => {
+    // Cancel if released early and reset progress
+    clearAnimationRef.current?.stop();
+    Animated.timing(clearProgress, {
+      toValue: 0,
+      duration: 150,
+      useNativeDriver: false,
+    }).start();
+  }, [clearProgress]);
 
   const handleSpeak = useCallback(() => {
     if (Platform.OS === 'web' && typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -148,15 +186,35 @@ export default function HomeScreen() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Clear message"
-            onPress={handleClear}
+            onPressIn={handleClearPressIn}
+            onPressOut={handleClearPressOut}
             style={({ pressed }) => [
               styles.iconButton,
               styles.iconButtonLarge,
               { backgroundColor: destructiveSurface },
               pressed && styles.pressed,
+              { position: 'relative' },
             ]}
           >
-            <MaterialCommunityIcons name="close" size={28} color={destructiveIcon} />
+            <MaterialCommunityIcons name="trash-can-outline" size={28} color={destructiveIcon} />
+            <View
+              pointerEvents="none"
+              style={styles.clearFillContainer}
+              onLayout={(e) => setClearTrackHeight(e.nativeEvent.layout.height)}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
+              <Animated.View
+                style={[
+                  styles.clearFill,
+                  {
+                    height: clearTrackHeight
+                      ? Animated.multiply(clearProgress, clearTrackHeight)
+                      : 0,
+                  },
+                ]}
+              />
+            </View>
           </Pressable>
         </View>
 
@@ -337,37 +395,41 @@ const styles = StyleSheet.create({
   bottomRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     marginTop: 4,
     gap: 8,
   },
   numberButton: {
     height: 64,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 61,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#3f3f46',
     backgroundColor: '#27272a',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
   },
   numberButtonText: {
-    fontSize: 20,
+    fontSize: 26,
     fontWeight: '700',
     color: '#ffffff',
   },
   spaceBar: {
-    flex: 0.75,
+    flex: 0.88,
     height: 64,
     borderRadius: 12,
     backgroundColor: '#27272a',
     borderWidth: 1,
     borderColor: '#3f3f46',
+    marginLeft: 42,
   },
   backspaceButton: {
     height: 64,
-    width: 64,
+    width: 165,
     borderRadius: 12,
     backgroundColor: '#27272a',
+    marginLeft: 'auto',
   },
   iconButton: {
     alignItems: 'center',
@@ -384,5 +446,21 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.7,
+  },
+  clearFillContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  clearFill: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#ef4444',
   },
 });
