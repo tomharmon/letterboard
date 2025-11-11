@@ -75,7 +75,6 @@ export default function HomeScreen() {
     Alert.alert('Speech unavailable', 'Speech playback is only supported on web right now.');
   }, [text]);
 
-  const timestampColor = colorScheme === 'dark' ? '#a1a1aa' : '#6b7280';
   const mutedText = colorScheme === 'dark' ? '#d4d4d8' : '#6b7280';
   const neutralSurface = colorScheme === 'dark' ? '#1f2937' : '#f3f4f6';
   const destructiveSurface = colorScheme === 'dark' ? '#4b5563' : '#4b5563';
@@ -100,15 +99,12 @@ export default function HomeScreen() {
             { backgroundColor: palette.background, borderBottomColor: dividerColor },
           ]}
         >
-          <View style={styles.headerLeft}>
-            <IconButton
-              name="menu"
-              iconColor={palette.text}
-              accessibilityLabel="Open menu"
-              containerStyle={styles.iconButtonSmall}
-            />
-            <Text style={[styles.timestamp, { color: timestampColor }]}>5:41PM Sat Nov 8</Text>
-          </View>
+          <IconButton
+            name="menu"
+            iconColor={palette.text}
+            accessibilityLabel="Open menu"
+            containerStyle={styles.iconButtonSmall}
+          />
           <Text style={[styles.title, { color: palette.text }]}>Letterboard</Text>
         </View>
 
@@ -144,19 +140,7 @@ export default function HomeScreen() {
                 adjustsFontSizeToFit
                 minimumFontScale={0.5}
               >
-                {words.map((word, idx) => {
-                  const isBirthday = word.toUpperCase() === 'BIRTHDAY';
-                  const trailingSpace = idx < words.length - 1 ? ' ' : '';
-                  return (
-                    <Text
-                      key={`${word}-${idx}`}
-                      style={isBirthday ? styles.highlightedWord : undefined}
-                    >
-                      {word}
-                      {trailingSpace}
-                    </Text>
-                  );
-                })}
+                {words.join(' ')}
               </Text>
             )}
           </View>
@@ -288,15 +272,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  timestamp: {
-    marginLeft: 12,
-    fontSize: 12,
-    fontWeight: '500',
-  },
   title: {
     fontSize: 22,
     fontWeight: '700',
@@ -323,9 +298,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '500',
   },
-  highlightedWord: {
-    color: '#dc2626',
-  },
   keyboardWrapper: {
     flex: 1,
     marginTop: 8,
@@ -342,15 +314,16 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   letterGrid: {
+    flex: 1,
     gap: 4,
   },
   letterRow: {
+    flex: 1,
     flexDirection: 'row',
     gap: 6,
   },
   letterButton: {
     flex: 1,
-    height: 56,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -369,7 +342,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   numberButton: {
-    paddingHorizontal: 16,
+    height: 64,
+    paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 1,
@@ -382,16 +356,16 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   spaceBar: {
-    flex: 1,
-    height: 48,
+    flex: 0.75,
+    height: 64,
     borderRadius: 12,
     backgroundColor: '#27272a',
     borderWidth: 1,
     borderColor: '#3f3f46',
   },
   backspaceButton: {
-    height: 48,
-    width: 48,
+    height: 64,
+    width: 64,
     borderRadius: 12,
     backgroundColor: '#27272a',
   },
