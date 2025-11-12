@@ -18,6 +18,7 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 const COLUMNS = 6;
+const GRID_GAP = 6;
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -28,7 +29,6 @@ export default function HomeScreen() {
   const clearProgress = useRef(new Animated.Value(0)).current;
   const clearAnimationRef = useRef<Animated.CompositeAnimation | null>(null);
   const [clearTrackHeight, setClearTrackHeight] = useState(0);
-  const [letterKeyWidth, setLetterKeyWidth] = useState<number | null>(null);
 
   const letterRows = useMemo(() => {
     // Desired layout:
@@ -233,10 +233,6 @@ export default function HomeScreen() {
                       <Pressable
                         key={letter}
                         onPress={() => handleLetterClick(letter)}
-                        onLayout={(e) => {
-                          const w = e.nativeEvent.layout.width;
-                          setLetterKeyWidth((prev) => (prev == null ? w : prev));
-                        }}
                         accessibilityRole="button"
                         accessibilityLabel={`Add letter ${letter}`}
                         style={({ pressed }) => [
@@ -262,58 +258,64 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.bottomRow}>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Toggle numbers"
-                style={({ pressed }) => [
-                  styles.numberButton,
-                  { width: letterKeyWidth ?? 64, paddingHorizontal: 0 },
-                  { backgroundColor: keyDefault, borderColor: keyBorder },
-                  pressed && styles.pressed,
-                ]}
-                onPress={() => {
-                  // Future enhancement for toggling numeric layout.
-                }}
-              >
-                <Text style={[styles.numberButtonText, { color: keyText }]}>123</Text>
-              </Pressable>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Add space"
-                onPress={handleSpace}
-                style={({ pressed }) => [
-                  styles.spaceBar,
-                  { width: (letterKeyWidth ?? 64) * 3, paddingHorizontal: 0 },
-                  { backgroundColor: keyDefault, borderColor: keyBorder },
-                  pressed && { backgroundColor: keyPressed },
-                ]}
-              />
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="New line"
-                onPress={handleEnter}
-                style={({ pressed }) => [
-                  styles.iconButton,
-                  styles.enterButton,
-                  { backgroundColor: keyDefault },
-                  pressed && styles.pressed,
-                ]}
-              >
-                <MaterialCommunityIcons name="keyboard-return" size={28} color={keyText} />
-              </Pressable>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Delete last letter"
-                onPress={handleBackspace}
-                style={({ pressed }) => [
-                  styles.iconButton,
-                  styles.backspaceButton,
-                  { backgroundColor: keyDefault },
-                  pressed && styles.pressed,
-                ]}
-              >
-                <MaterialCommunityIcons name="backspace-outline" size={28} color={keyText} />
-              </Pressable>
+              <View style={[styles.slot, { flex: 1 }]}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Toggle numbers"
+                  style={({ pressed }) => [
+                    styles.numberButton,
+                    { backgroundColor: keyDefault, borderColor: keyBorder },
+                    pressed && styles.pressed,
+                  ]}
+                  onPress={() => {
+                    // Future enhancement for toggling numeric layout.
+                  }}
+                >
+                  <Text style={[styles.numberButtonText, { color: keyText }]}>123</Text>
+                </Pressable>
+              </View>
+              <View style={[styles.slot, { flex: 3 }]}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Add space"
+                  onPress={handleSpace}
+                  style={({ pressed }) => [
+                    styles.spaceBar,
+                    { backgroundColor: keyDefault, borderColor: keyBorder },
+                    pressed && { backgroundColor: keyPressed },
+                  ]}
+                />
+              </View>
+              <View style={[styles.slot, { flex: 1 }]}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="New line"
+                  onPress={handleEnter}
+                  style={({ pressed }) => [
+                    styles.iconButton,
+                    styles.enterButton,
+                    { backgroundColor: keyDefault },
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <MaterialCommunityIcons name="keyboard-return" size={28} color={keyText} />
+                </Pressable>
+              </View>
+              <View style={[styles.slot, { flex: 1 }]}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Delete last letter"
+                  onPress={handleBackspace}
+                  style={({ pressed }) => [
+                    styles.iconButton,
+                    styles.backspaceButton,
+                    { backgroundColor: keyDefault },
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <MaterialCommunityIcons name="backspace-outline" size={28} color={keyText} />
+                </Pressable>
+              </View>
             </View>
           </View>
         </View>
@@ -410,7 +412,7 @@ const styles = StyleSheet.create({
   letterRow: {
     flex: 1,
     flexDirection: 'row',
-    gap: 6,
+    gap: GRID_GAP,
   },
   letterButton: {
     flex: 1,
@@ -429,10 +431,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     marginTop: 4,
-    gap: 8,
+    gap: GRID_GAP,
+  },
+  slot: {
+    flexBasis: 0,
   },
   numberButton: {
     height: 64,
+    width: '100%',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#3f3f46',
@@ -447,6 +453,7 @@ const styles = StyleSheet.create({
   },
   spaceBar: {
     height: 64,
+    width: '100%',
     borderRadius: 12,
     backgroundColor: '#27272a',
     borderWidth: 1,
@@ -454,16 +461,15 @@ const styles = StyleSheet.create({
   },
   enterButton: {
     height: 64,
-    width: 140,
+    width: '100%',
     borderRadius: 12,
     backgroundColor: '#27272a',
   },
   backspaceButton: {
     height: 64,
-    width: 165,
+    width: '100%',
     borderRadius: 12,
     backgroundColor: '#27272a',
-    marginLeft: 'auto',
   },
   iconButton: {
     alignItems: 'center',

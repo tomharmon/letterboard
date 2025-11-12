@@ -1,5 +1,6 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Href } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
 import React, { ComponentProps } from 'react';
 import { StyleSheet } from 'react-native';
@@ -67,6 +68,7 @@ export default function TabLayout() {
         headerShown: false,
         drawerStyle: {
           backgroundColor: palette.background,
+          width: '20%',
         },
         drawerActiveBackgroundColor: palette.tint,
         drawerActiveTintColor: palette.background,
