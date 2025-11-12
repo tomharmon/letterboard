@@ -1,10 +1,8 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import * as Haptics from 'expo-haptics';
-import { Tabs, usePathname, useRouter, type Href } from 'expo-router';
+import { Drawer } from 'expo-router/drawer';
 import React, { ComponentProps } from 'react';
-import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StyleSheet } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -59,176 +57,71 @@ const TAB_CONFIG: readonly TabConfig[] = [
   },
 ];
 
-const COMPACT_BREAKPOINT = 768;
-const COMPACT_WIDTH = 88;
-const DEFAULT_WIDTH = 120;
-
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const palette = Colors[colorScheme ?? 'light'];
-  const { width: windowWidth } = useWindowDimensions();
-  const sidebarWidth = windowWidth < COMPACT_BREAKPOINT ? COMPACT_WIDTH : DEFAULT_WIDTH;
 
   return (
-    <View style={styles.container}>
-      <Sidebar width={sidebarWidth} />
-      <View style={[styles.content, { backgroundColor: palette.background }]}>
-        <Tabs
-          screenOptions={{
-            headerShown: false,
-          }}
-          tabBar={() => null}
-        >
-          <Tabs.Screen
-            name="index"
-            options={{
-              title: 'Letterboard',
-            }}
-          />
-          <Tabs.Screen
-            name="choice-board"
-            options={{
-              title: 'Choice board',
-            }}
-          />
-          <Tabs.Screen
-            name="emoji-board"
-            options={{
-              title: 'Emoji board',
-            }}
-          />
-          <Tabs.Screen
-            name="settings"
-            options={{
-              title: 'Settings',
-            }}
-          />
-          <Tabs.Screen
-            name="help"
-            options={{
-              title: 'Help',
-            }}
-          />
-        </Tabs>
-      </View>
-    </View>
-  );
-}
-
-type SidebarProps = {
-  width: number;
-};
-
-function Sidebar({ width }: SidebarProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const colorScheme = useColorScheme();
-  const palette = Colors[colorScheme ?? 'light'];
-  const insets = useSafeAreaInsets();
-  const pressedBackground =
-    colorScheme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)';
-
-  return (
-    <View
-      style={[
-        styles.sidebar,
-        {
-          width,
-          paddingTop: insets.top + 16,
-          paddingBottom: insets.bottom + 16,
+    <Drawer
+      screenOptions={{
+        headerShown: false,
+        drawerStyle: {
           backgroundColor: palette.background,
-          borderRightColor: palette.tabIconDefault,
         },
-      ]}
+        drawerActiveBackgroundColor: palette.tint,
+        drawerActiveTintColor: palette.background,
+        drawerInactiveTintColor: palette.text,
+      }}
     >
-      {TAB_CONFIG.map((tab, index) => {
-        const isFocused = isRouteActive(pathname as Href, tab.href);
-
-        const handlePress = () => {
-          if (isFocused) {
-            return;
-          }
-
-          if (process.env.EXPO_OS === 'ios') {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }
-
-          router.navigate(tab.href);
-        };
-
-        return (
-          <Pressable
-            key={tab.key}
-            accessibilityRole="tab"
-            accessibilityState={isFocused ? { selected: true } : {}}
-            onPress={handlePress}
-            style={({ pressed }) => [
-              styles.tabButton,
-              index === TAB_CONFIG.length - 1 ? styles.lastTabButton : undefined,
-              isFocused && { backgroundColor: palette.tint },
-              !isFocused && pressed && { backgroundColor: pressedBackground },
-            ]}
-          >
-            {tab.icon.family === 'community' ? (
-              <MaterialCommunityIcons
-                size={28}
-                name={tab.icon.name}
-                color={isFocused ? palette.background : palette.icon}
-              />
-            ) : (
-              <MaterialIcons
-                size={28}
-                name={tab.icon.name}
-                color={isFocused ? palette.background : palette.icon}
-              />
-            )}
-            <Text
-              style={[
-                styles.label,
-                { color: isFocused ? palette.background : palette.text },
-              ]}
-            >
-              {tab.title}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
+      <Drawer.Screen
+        name="index"
+        options={{
+          title: 'Home',
+          drawerIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="alphabetical-variant" color={color} size={size} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="choice-board"
+        options={{
+          title: 'Choice board',
+          drawerIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="checkbox-multiple-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="emoji-board"
+        options={{
+          title: 'Emoji board',
+          drawerIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="emoticon-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          drawerIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="cog-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="help"
+        options={{
+          title: 'Help',
+          drawerIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="help-circle-outline" color={color} size={size} />
+          ),
+        }}
+      />
+    </Drawer>
   );
-}
-
-function isRouteActive(pathname: Href, href: Href) {
-  return pathname === href;
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  content: {
-    flex: 1,
-  },
-  sidebar: {
-    borderRightWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 12,
-    alignItems: 'stretch',
-  },
-  tabButton: {
-    borderRadius: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  lastTabButton: {
-    marginBottom: 0,
-  },
-  label: {
-    marginTop: 6,
-    fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
+  // Drawer-specific styles can be added here if needed in future
 });

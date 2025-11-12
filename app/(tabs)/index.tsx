@@ -1,5 +1,6 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Speech from '@mhpdev/react-native-speech';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useCallback, useMemo, useRef, useState, type ComponentProps } from 'react';
 import {
   Animated,
@@ -19,6 +20,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 const COLUMNS = 6;
 
 export default function HomeScreen() {
+  const navigation = useNavigation();
   const colorScheme = useColorScheme();
   const palette = Colors[colorScheme ?? 'light'];
   const [text, setText] = useState('');
@@ -134,7 +136,7 @@ export default function HomeScreen() {
       <View style={styles.container}>
         <View
           style={[
-            styles.header,
+            styles.displayRow,
             { backgroundColor: palette.background, borderBottomColor: dividerColor },
           ]}
         >
@@ -142,17 +144,9 @@ export default function HomeScreen() {
             name="menu"
             iconColor={palette.text}
             accessibilityLabel="Open menu"
-            containerStyle={styles.iconButtonSmall}
+            containerStyle={styles.iconButtonLarge}
+            onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
           />
-          <Text style={[styles.title, { color: palette.text }]}>Letterboard</Text>
-        </View>
-
-        <View
-          style={[
-            styles.displayRow,
-            { backgroundColor: palette.background, borderBottomColor: dividerColor },
-          ]}
-        >
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Speak out loud"
@@ -309,13 +303,15 @@ type IconButtonProps = {
   iconColor: string;
   accessibilityLabel: string;
   containerStyle?: StyleProp<ViewStyle>;
+  onPress?: () => void;
 };
 
-function IconButton({ name, iconColor, accessibilityLabel, containerStyle }: IconButtonProps) {
+function IconButton({ name, iconColor, accessibilityLabel, containerStyle, onPress }: IconButtonProps) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
+      onPress={onPress}
       style={({ pressed }) => [
         styles.iconButton,
         containerStyle,
