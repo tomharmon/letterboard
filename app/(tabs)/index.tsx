@@ -117,9 +117,11 @@ export default function HomeScreen() {
   const destructiveSurface = colorScheme === 'dark' ? '#4b5563' : '#4b5563';
   const destructiveIcon = '#ffffff';
   const dividerColor = colorScheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.08)';
-  const keyboardBackground = '#18181b';
-  const keyDefault = '#27272a';
-  const keyPressed = '#3f3f46';
+  const keyboardBackground = colorScheme === 'dark' ? '#18181b' : '#f3f4f6';
+  const keyDefault = colorScheme === 'dark' ? '#27272a' : '#ffffff';
+  const keyPressed = colorScheme === 'dark' ? '#3f3f46' : '#e5e7eb';
+  const keyText = colorScheme === 'dark' ? '#ffffff' : '#111827';
+  const keyBorder = colorScheme === 'dark' ? '#3f3f46' : '#d1d5db';
 
   return (
     <SafeAreaView
@@ -240,7 +242,7 @@ export default function HomeScreen() {
                           pressed && { backgroundColor: keyPressed },
                         ]}
                       >
-                        <Text style={styles.letter}>{letter}</Text>
+                        <Text style={[styles.letter, { color: keyText }]}>{letter}</Text>
                       </Pressable>
                     ) : (
                       <View
@@ -262,13 +264,14 @@ export default function HomeScreen() {
                 accessibilityLabel="Toggle numbers"
                 style={({ pressed }) => [
                   styles.numberButton,
+                  { backgroundColor: keyDefault, borderColor: keyBorder },
                   pressed && styles.pressed,
                 ]}
                 onPress={() => {
                   // Future enhancement for toggling numeric layout.
                 }}
               >
-                <Text style={styles.numberButtonText}>123</Text>
+                <Text style={[styles.numberButtonText, { color: keyText }]}>123</Text>
               </Pressable>
               <Pressable
                 accessibilityRole="button"
@@ -276,6 +279,7 @@ export default function HomeScreen() {
                 onPress={handleSpace}
                 style={({ pressed }) => [
                   styles.spaceBar,
+                  { backgroundColor: keyDefault, borderColor: keyBorder },
                   pressed && { backgroundColor: keyPressed },
                 ]}
               />
@@ -286,10 +290,11 @@ export default function HomeScreen() {
                 style={({ pressed }) => [
                   styles.iconButton,
                   styles.backspaceButton,
+                  { backgroundColor: keyDefault },
                   pressed && styles.pressed,
                 ]}
               >
-                <MaterialCommunityIcons name="backspace-outline" size={28} color="#ffffff" />
+                <MaterialCommunityIcons name="backspace-outline" size={28} color={keyText} />
               </Pressable>
             </View>
           </View>
