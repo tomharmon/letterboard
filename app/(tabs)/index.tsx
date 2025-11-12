@@ -28,6 +28,7 @@ export default function HomeScreen() {
   const clearProgress = useRef(new Animated.Value(0)).current;
   const clearAnimationRef = useRef<Animated.CompositeAnimation | null>(null);
   const [clearTrackHeight, setClearTrackHeight] = useState(0);
+  const [letterKeyWidth, setLetterKeyWidth] = useState<number | null>(null);
 
   const letterRows = useMemo(() => {
     // Desired layout:
@@ -69,6 +70,10 @@ export default function HomeScreen() {
 
   const handleSpace = useCallback(() => {
     setText((prev) => prev + ' ');
+  }, []);
+
+  const handleEnter = useCallback(() => {
+    setText((prev) => prev + '\n');
   }, []);
 
   const handleClear = useCallback(() => {
@@ -173,7 +178,7 @@ export default function HomeScreen() {
                 adjustsFontSizeToFit
                 minimumFontScale={0.5}
               >
-                {words.join(' ')}
+                {text}
               </Text>
             )}
           </View>
@@ -228,6 +233,10 @@ export default function HomeScreen() {
                       <Pressable
                         key={letter}
                         onPress={() => handleLetterClick(letter)}
+                        onLayout={(e) => {
+                          const w = e.nativeEvent.layout.width;
+                          setLetterKeyWidth((prev) => (prev == null ? w : prev));
+                        }}
                         accessibilityRole="button"
                         accessibilityLabel={`Add letter ${letter}`}
                         style={({ pressed }) => [
@@ -258,6 +267,7 @@ export default function HomeScreen() {
                 accessibilityLabel="Toggle numbers"
                 style={({ pressed }) => [
                   styles.numberButton,
+                  { width: letterKeyWidth ?? 64, paddingHorizontal: 0 },
                   { backgroundColor: keyDefault, borderColor: keyBorder },
                   pressed && styles.pressed,
                 ]}
@@ -273,10 +283,24 @@ export default function HomeScreen() {
                 onPress={handleSpace}
                 style={({ pressed }) => [
                   styles.spaceBar,
+                  { width: (letterKeyWidth ?? 64) * 3, paddingHorizontal: 0 },
                   { backgroundColor: keyDefault, borderColor: keyBorder },
                   pressed && { backgroundColor: keyPressed },
                 ]}
               />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="New line"
+                onPress={handleEnter}
+                style={({ pressed }) => [
+                  styles.iconButton,
+                  styles.enterButton,
+                  { backgroundColor: keyDefault },
+                  pressed && styles.pressed,
+                ]}
+              >
+                <MaterialCommunityIcons name="keyboard-return" size={28} color={keyText} />
+              </Pressable>
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Delete last letter"
@@ -409,14 +433,12 @@ const styles = StyleSheet.create({
   },
   numberButton: {
     height: 64,
-    paddingHorizontal: 61,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#3f3f46',
     backgroundColor: '#27272a',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 16,
   },
   numberButtonText: {
     fontSize: 26,
@@ -424,13 +446,17 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   spaceBar: {
-    flex: 0.88,
     height: 64,
     borderRadius: 12,
     backgroundColor: '#27272a',
     borderWidth: 1,
     borderColor: '#3f3f46',
-    marginLeft: 42,
+  },
+  enterButton: {
+    height: 64,
+    width: 140,
+    borderRadius: 12,
+    backgroundColor: '#27272a',
   },
   backspaceButton: {
     height: 64,
