@@ -25,32 +25,74 @@ export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const palette = Colors[colorScheme ?? 'light'];
   const [text, setText] = useState('');
+  const [isNumericMode, setIsNumericMode] = useState(false);
   const clearHoldMs = 1000;
   const clearProgress = useRef(new Animated.Value(0)).current;
   const clearAnimationRef = useRef<Animated.CompositeAnimation | null>(null);
   const [clearTrackHeight, setClearTrackHeight] = useState(0);
 
   const letterRows = useMemo(() => {
-    // Desired layout:
-    // - 6 columns total
-    // - Rows 1–5 only: fill columns 1–5 with A–Y, column 6 empty except for Z
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    const rows: Array<Array<string | null>> = Array.from({ length: 5 }, () =>
-      Array(COLUMNS).fill(null),
-    );
+    if (isNumericMode) {
+      // Numpad layout: centered 3-column numpad
+      // Row 1: 7 8 9
+      // Row 2: 4 5 6
+      // Row 3: 1 2 3
+      // Row 4: 0 . , (left-aligned)
+      // Row 5: remaining symbols
+      const rows: Array<Array<string | null>> = Array.from({ length: 5 }, () =>
+        Array(COLUMNS).fill(null),
+      );
 
-    let index = 0;
-    for (let r = 0; r < rows.length; r++) {
-      for (let c = 0; c < 5; c++) {
-        rows[r][c] = alphabet[index++];
+      // Row 1: 7 8 9 (centered in columns 1-3)
+      rows[0][1] = '7';
+      rows[0][2] = '8';
+      rows[0][3] = '9';
+
+      // Row 2: 4 5 6 (centered in columns 1-3)
+      rows[1][1] = '4';
+      rows[1][2] = '5';
+      rows[1][3] = '6';
+
+      // Row 3: 1 2 3 (centered in columns 1-3)
+      rows[2][1] = '1';
+      rows[2][2] = '2';
+      rows[2][3] = '3';
+
+      // Row 4: 0 . , (left-aligned)
+      rows[3][1] = '0';
+      rows[3][2] = '.';
+      rows[3][3] = ',';
+
+      // Row 5: remaining symbols
+      const symbols = ['-', '/', '×', '(', ')'];
+      let symIndex = 0;
+      for (let c = 1; c < COLUMNS && symIndex < symbols.length; c++) {
+        rows[4][c] = symbols[symIndex++];
       }
-      // rows[r][5] remains null to create the empty vertical column
-    }
-    // Place Z at the end of the fifth row (move up one row)
-    rows[4][5] = alphabet[index] ?? null;
 
-    return rows;
-  }, []);
+      return rows;
+    } else {
+      // Desired layout:
+      // - 6 columns total
+      // - Rows 1–5 only: fill columns 1–5 with A–Y, column 6 empty except for Z
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+      const rows: Array<Array<string | null>> = Array.from({ length: 5 }, () =>
+        Array(COLUMNS).fill(null),
+      );
+
+      let index = 0;
+      for (let r = 0; r < rows.length; r++) {
+        for (let c = 0; c < 5; c++) {
+          rows[r][c] = alphabet[index++];
+        }
+        // rows[r][5] remains null to create the empty vertical column
+      }
+      // Place Z at the end of the fifth row (move up one row)
+      rows[4][5] = alphabet[index] ?? null;
+
+      return rows;
+    }
+  }, [isNumericMode]);
 
   const words = useMemo(() => {
     if (!text.trim()) {
@@ -234,7 +276,7 @@ export default function HomeScreen() {
                         key={letter}
                         onPress={() => handleLetterClick(letter)}
                         accessibilityRole="button"
-                        accessibilityLabel={`Add letter ${letter}`}
+                        accessibilityLabel={`Add ${letter}`}
                         style={({ pressed }) => [
                           styles.letterButton,
                           { backgroundColor: keyDefault },
@@ -261,17 +303,19 @@ export default function HomeScreen() {
               <View style={[styles.slot, { flex: 1 }]}>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel="Toggle numbers"
+                  accessibilityLabel={isNumericMode ? "Switch to letters" : "Switch to numbers"}
                   style={({ pressed }) => [
                     styles.numberButton,
                     { backgroundColor: keyDefault, borderColor: keyBorder },
                     pressed && styles.pressed,
                   ]}
                   onPress={() => {
-                    // Future enhancement for toggling numeric layout.
+                    setIsNumericMode((prev) => !prev);
                   }}
                 >
-                  <Text style={[styles.numberButtonText, { color: keyText }]}>123</Text>
+                  <Text style={[styles.numberButtonText, { color: keyText }]}>
+                    {isNumericMode ? 'ABC' : '123'}
+                  </Text>
                 </Pressable>
               </View>
               <View style={[styles.slot, { flex: 3 }]}>
