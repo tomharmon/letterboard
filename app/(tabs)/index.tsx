@@ -4,8 +4,10 @@ import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useCallback, useMemo, useRef, useState, type ComponentProps } from 'react';
 import {
   Animated,
+  Dimensions,
   Easing,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -26,6 +28,7 @@ export default function HomeScreen() {
   const palette = Colors[colorScheme ?? 'light'];
   const [text, setText] = useState('');
   const [isNumericMode, setIsNumericMode] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const clearHoldMs = 1000;
   const clearProgress = useRef(new Animated.Value(0)).current;
   const clearAnimationRef = useRef<Animated.CompositeAnimation | null>(null);
@@ -161,6 +164,10 @@ export default function HomeScreen() {
     });
   }, [text]);
 
+  const handleToggleExpand = useCallback(() => {
+    setIsExpanded((prev) => !prev);
+  }, []);
+
   const mutedText = colorScheme === 'dark' ? '#d4d4d8' : '#6b7280';
   const neutralSurface = colorScheme === 'dark' ? '#1f2937' : '#f3f4f6';
   const destructiveSurface = colorScheme === 'dark' ? '#4b5563' : '#4b5563';
@@ -185,85 +192,110 @@ export default function HomeScreen() {
           style={[
             styles.displayRow,
             { backgroundColor: palette.background, borderBottomColor: dividerColor },
+            isExpanded && styles.displayRowExpanded,
           ]}
         >
           <IconButton
             name="menu"
             iconColor={palette.text}
             accessibilityLabel="Open menu"
-            containerStyle={styles.iconButtonLarge}
+            containerStyle={[styles.iconButtonLarge, styles.menuButton]}
             onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
           />
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Speak out loud"
-            onPress={handleSpeak}
-            style={({ pressed }) => [
-              styles.iconButton,
-              styles.iconButtonLarge,
-              { backgroundColor: neutralSurface },
-              pressed && styles.pressed,
-            ]}
-          >
-            <MaterialCommunityIcons name="volume-high" size={28} color={palette.text} />
-          </Pressable>
+          <View style={styles.leftColumn}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Speak out loud"
+              onPress={handleSpeak}
+              style={({ pressed }) => [
+                styles.iconButton,
+                styles.iconButtonLarge,
+                { backgroundColor: neutralSurface },
+                pressed && styles.pressed,
+              ]}
+            >
+              <MaterialCommunityIcons name="volume-high" size={28} color={palette.text} />
+            </Pressable>
+          </View>
 
-          <View style={styles.textContainer}>
+          <ScrollView
+            style={[
+              styles.textContainer,
+              isExpanded && styles.textContainerExpanded,
+            ]}
+            contentContainerStyle={styles.textContainerContent}
+            showsVerticalScrollIndicator={true}
+          >
             {words.length === 0 ? (
               <Text style={[styles.placeholderText, { color: mutedText }]}>
                 Tap letters to start building a message.
               </Text>
             ) : (
-              <Text
-                style={[styles.displayText, { color: palette.text }]}
-                numberOfLines={2}
-                adjustsFontSizeToFit
-                minimumFontScale={0.5}
-              >
+              <Text style={[styles.displayText, { color: palette.text }]}>
                 {text}
               </Text>
             )}
-          </View>
+          </ScrollView>
 
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Clear message"
-            onPressIn={handleClearPressIn}
-            onPressOut={handleClearPressOut}
-            style={({ pressed }) => [
-              styles.iconButton,
-              styles.iconButtonLarge,
-              { backgroundColor: destructiveSurface },
-              pressed && styles.pressed,
-              { position: 'relative' },
-            ]}
-          >
-            <MaterialCommunityIcons name="trash-can-outline" size={28} color={destructiveIcon} />
-            <View
-              pointerEvents="none"
-              style={styles.clearFillContainer}
-              onLayout={(e) => setClearTrackHeight(e.nativeEvent.layout.height)}
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
+          <View style={styles.rightColumn}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Clear message"
+              onPressIn={handleClearPressIn}
+              onPressOut={handleClearPressOut}
+              style={({ pressed }) => [
+                styles.iconButton,
+                styles.iconButtonLarge,
+                { backgroundColor: destructiveSurface },
+                pressed && styles.pressed,
+                { position: 'relative' },
+              ]}
             >
-              <Animated.View
-                style={[
-                  styles.clearFill,
-                  {
-                    height: clearTrackHeight
-                      ? Animated.multiply(clearProgress, clearTrackHeight)
-                      : 0,
-                  },
-                ]}
+              <MaterialCommunityIcons name="trash-can-outline" size={28} color={destructiveIcon} />
+              <View
+                pointerEvents="none"
+                style={styles.clearFillContainer}
+                onLayout={(e) => setClearTrackHeight(e.nativeEvent.layout.height)}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              >
+                <Animated.View
+                  style={[
+                    styles.clearFill,
+                    {
+                      height: clearTrackHeight
+                        ? Animated.multiply(clearProgress, clearTrackHeight)
+                        : 0,
+                    },
+                  ]}
+                />
+              </View>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={isExpanded ? "Collapse text area" : "Expand text area"}
+              onPress={handleToggleExpand}
+              style={({ pressed }) => [
+                styles.iconButton,
+                styles.iconButtonLarge,
+                { backgroundColor: neutralSurface },
+                pressed && styles.pressed,
+              ]}
+            >
+              <MaterialCommunityIcons 
+                name={isExpanded ? "chevron-up" : "chevron-down"} 
+                size={28} 
+                color={palette.text} 
               />
-            </View>
-          </Pressable>
+            </Pressable>
+          </View>
         </View>
 
         <View
           style={[
             styles.keyboardWrapper,
             { backgroundColor: keyboardBackground, borderTopColor: dividerColor },
+            isExpanded && styles.keyboardWrapperHidden,
           ]}
         >
           <View style={styles.keyboardInner}>
@@ -405,7 +437,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 2,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   title: {
@@ -414,16 +446,46 @@ const styles = StyleSheet.create({
   },
   displayRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: 8,
+    paddingBottom: 6,
     borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: 6,
+    flexShrink: 0,
+    maxHeight: 200,
+    position: 'relative',
+  },
+  displayRowExpanded: {
+    maxHeight: Dimensions.get('window').height * 0.7,
+    flex: 1,
+  },
+  menuButton: {
+    position: 'absolute',
+    top: 8,
+    left: 16,
+    zIndex: 10,
+  },
+  leftColumn: {
+    flexDirection: 'column',
+    gap: 12,
+    marginLeft: 56, // Account for menu button width + gap
+  },
+  rightColumn: {
+    flexDirection: 'column',
     gap: 12,
   },
   textContainer: {
     flex: 1,
     paddingHorizontal: 16,
+    height: 100,
+  },
+  textContainerExpanded: {
+    height: '100%',
+    flex: 1,
+  },
+  textContainerContent: {
+    paddingBottom: 4,
   },
   displayText: {
     fontSize: 34,
@@ -444,6 +506,13 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 12,
     overflow: 'hidden',
+  },
+  keyboardWrapperHidden: {
+    height: 0,
+    overflow: 'hidden',
+    marginTop: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
   },
   keyboardInner: {
     flex: 1,
