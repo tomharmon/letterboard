@@ -1,21 +1,45 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Speech from '@mhpdev/react-native-speech';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { Image, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Dimensions, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-export default function TabTwoScreen() {
+type FaceEmoji = { emoji: string; emotion: string };
+
+const faceEmojis: FaceEmoji[] = [
+  { emoji: '😀', emotion: 'happy' },
+  { emoji: '😌', emotion: 'relaxed' },
+  { emoji: '❤️', emotion: 'love' },
+  { emoji: '😎', emotion: 'cool' },
+  { emoji: '🤪', emotion: 'silly' },
+  { emoji: '🤩', emotion: 'excited' },
+  { emoji: '🤒', emotion: 'sick' },
+  { emoji: '🥱', emotion: 'tired' },
+  { emoji: '🤔', emotion: 'confused' },
+  { emoji: '🤯', emotion: 'surprised' },
+  { emoji: '😵‍💫', emotion: 'overwhelmed' },
+  { emoji: '😰', emotion: 'anxious' },
+  { emoji: '😣', emotion: 'frustrated' },
+  { emoji: '😢', emotion: 'sad' },
+  { emoji: '😡', emotion: 'angry' },
+];
+
+export default function EmojiBoardScreen() {
   const navigation = useNavigation();
   const colorScheme = useColorScheme();
   const palette = Colors[colorScheme ?? 'light'];
+  
+  // Calculate key width to ensure consistent sizing across all rows
+  const screenWidth = Dimensions.get('window').width;
+  const numColumns = 5;
+  const horizontalPadding = 16 * 2; // left + right padding
+  const gap = 12;
+  const totalGaps = gap * (numColumns - 1);
+  const keyWidth = (screenWidth - horizontalPadding - totalGaps) / numColumns;
 
   return (
     <SafeAreaView
@@ -38,90 +62,43 @@ export default function TabTwoScreen() {
           <MaterialCommunityIcons name="menu" size={28} color={palette.text} />
         </Pressable>
       </View>
-      <ParallaxScrollView
-        headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-        headerImage={
-          <MaterialIcons
-            size={310}
-            color="#808080"
-            name="code"
-            style={styles.headerImage}
-          />
-        }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
+      <FlatList
+        data={faceEmojis}
+        keyExtractor={(item) => item.emoji}
+        numColumns={5}
+        columnWrapperStyle={styles.row}
+        contentContainerStyle={styles.list}
+        renderItem={({ item }) => (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`${item.emotion} emoji`}
+            onPress={() => Speech.speak(item.emotion).catch((e) => console.error('Speech error:', e))}
+            style={({ pressed }) => [
+              styles.key,
+              {
+                width: keyWidth,
+                height: keyWidth,
+                backgroundColor: colorScheme === 'dark' ? '#1f2937' : '#ffffff',
+                borderColor: colorScheme === 'dark' ? '#374151' : '#e5e7eb',
+                opacity: pressed ? 0.9 : 1,
+                transform: [{ scale: pressed ? 0.98 : 1 }],
+              },
+            ]}
+          >
+            <ThemedText style={[styles.emoji, { color: palette.text }]}>
+              {item.emoji}
             </ThemedText>
-          ),
-        })}
-      </Collapsible>
-      </ParallaxScrollView>
+            <ThemedText
+              style={[
+                styles.label,
+                { color: palette.text, fontFamily: Fonts.rounded },
+              ]}
+            >
+              {item.emotion}
+            </ThemedText>
+          </Pressable>
+        )}
+      />
     </SafeAreaView>
   );
 }
@@ -143,14 +120,30 @@ const styles = StyleSheet.create({
     width: 48,
     borderRadius: 14,
   },
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  list: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  row: {
+    gap: 12,
+    paddingVertical: 8,
+  },
+  key: {
+    borderRadius: 16,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 6,
+  },
+  emoji: {
+    fontSize: 32,
+    lineHeight: 38,
+    textAlign: 'center',
+    includeFontPadding: true,
+  },
+  label: {
+    marginTop: 6,
+    fontSize: 14,
+    textAlign: 'center',
   },
 });
