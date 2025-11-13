@@ -1,26 +1,53 @@
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { DrawerActions, useNavigation } from '@react-navigation/native';
+import { Image, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Collapsible } from '@/components/ui/collapsible';
 import { ExternalLink } from '@/components/external-link';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Fonts } from '@/constants/theme';
+import { Colors, Fonts } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabTwoScreen() {
+  const navigation = useNavigation();
+  const colorScheme = useColorScheme();
+  const palette = Colors[colorScheme ?? 'light'];
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <MaterialIcons
-          size={310}
-          color="#808080"
-          name="code"
-          style={styles.headerImage}
-        />
-      }>
+    <SafeAreaView
+      style={[
+        styles.safeArea,
+        { backgroundColor: colorScheme === 'dark' ? '#111827' : '#f3f4f6' },
+      ]}
+      edges={['top', 'left', 'right']}
+    >
+      <View style={styles.header}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open menu"
+          onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+          style={({ pressed }) => [
+            styles.menuButton,
+            { opacity: pressed ? 0.7 : 1 },
+          ]}
+        >
+          <MaterialCommunityIcons name="menu" size={28} color={palette.text} />
+        </Pressable>
+      </View>
+      <ParallaxScrollView
+        headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
+        headerImage={
+          <MaterialIcons
+            size={310}
+            color="#808080"
+            name="code"
+            style={styles.headerImage}
+          />
+        }>
       <ThemedView style={styles.titleContainer}>
         <ThemedText
           type="title"
@@ -94,11 +121,28 @@ export default function TabTwoScreen() {
           ),
         })}
       </Collapsible>
-    </ParallaxScrollView>
+      </ParallaxScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  menuButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 48,
+    width: 48,
+    borderRadius: 14,
+  },
   headerImage: {
     color: '#808080',
     bottom: -90,
