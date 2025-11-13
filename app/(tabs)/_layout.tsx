@@ -1,62 +1,11 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Href } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
-import React, { ComponentProps } from 'react';
+import React from 'react';
 import { StyleSheet } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-type TabIcon =
-  | {
-      family: 'material';
-      name: ComponentProps<typeof MaterialIcons>['name'];
-    }
-  | {
-      family: 'community';
-      name: ComponentProps<typeof MaterialCommunityIcons>['name'];
-    };
-
-type TabConfig = {
-  key: string;
-  title: string;
-  href: Href;
-  icon: TabIcon;
-};
-
-const TAB_CONFIG: readonly TabConfig[] = [
-  {
-    key: 'home',
-    title: 'Home',
-    href: '/',
-    icon: { family: 'community', name: 'alphabetical-variant' },
-  },
-  {
-    key: 'choice-board',
-    title: 'Choice board',
-    href: '/choice-board',
-    icon: { family: 'community', name: 'checkbox-multiple-outline' },
-  },
-  {
-    key: 'emoji-board',
-    title: 'Emoji board',
-    href: '/emoji-board',
-    icon: { family: 'community', name: 'emoticon-outline' },
-  },
-  {
-    key: 'settings',
-    title: 'Settings',
-    href: '/settings',
-    icon: { family: 'community', name: 'cog-outline' },
-  },
-  {
-    key: 'help',
-    title: 'Help',
-    href: '/help',
-    icon: { family: 'community', name: 'help-circle-outline' },
-  },
-];
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -78,7 +27,7 @@ export default function TabLayout() {
       <Drawer.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Letterboard',
           drawerIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="alphabetical-variant" color={color} size={size} />
           ),
