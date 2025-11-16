@@ -49,8 +49,8 @@ export default function TabTwoScreen() {
               Bug and Feedback Reports
             </ThemedText>
             <ThemedText style={styles.sectionContent}>
-              Encountering a bug or have a feature request? We'd love to hear from you! Please contact
-              us by emailing tom@harmon.tech
+              Encountering a bug or have a feature request? We&apos;d love to hear from you! Please
+              contact us by emailing tom@harmon.tech
             </ThemedText>
             <Pressable
               onPress={handleEmailPress}
@@ -78,23 +78,9 @@ export default function TabTwoScreen() {
             <ThemedView style={styles.featuresContainer}>
               <ThemedView style={styles.versionSection}>
                 <ThemedText type="defaultSemiBold" style={styles.versionHeader}>
-                  MVP:
-                </ThemedText>
-                <ThemedText style={styles.featureItem}>• letterboard</ThemedText>
-                <ThemedText style={styles.featureItem}>• multiple choice board</ThemedText>
-                <ThemedText style={styles.featureItem}>• emoji board</ThemedText>
-                <ThemedText style={styles.featureItem}>• help/bug report</ThemedText>
-              </ThemedView>
-
-              <ThemedView style={styles.versionSection}>
-                <ThemedText type="defaultSemiBold" style={styles.versionHeader}>
                   v1.1
                 </ThemedText>
                 <ThemedText style={styles.featureItem}>• settings</ThemedText>
-                <ThemedText style={styles.subFeatureItem}>
-                  • keyboard layout customization: switch between qwerty and letterboard, as well as
-                  enable/disable punctuation keys.
-                </ThemedText>
                 <ThemedText style={styles.subFeatureItem}>
                   • enable/disable tactile feedback via vibration on each keypress
                 </ThemedText>
@@ -128,6 +114,19 @@ export default function TabTwoScreen() {
                   • session history: automatically save all spelled messages locally to your device.
                   these are completely private and never sent off-device.
                 </ThemedText>
+              </ThemedView>
+
+              <ThemedView style={styles.versionSection}>
+                <ThemedText type="defaultSemiBold" style={styles.versionHeader}>
+                  v1.4
+                </ThemedText>
+                <ThemedText style={styles.featureItem}>• settings</ThemedText>
+                <ThemedText style={styles.subFeatureItem}>
+                  • customizable theme colors for background colors and keyboard letter colors
+                </ThemedText>
+                <ThemedText style={styles.subFeatureItem}>• spell check</ThemedText>
+                <ThemedText style={styles.subFeatureItem}>• word prediction</ThemedText>
+                <ThemedText style={styles.subFeatureItem}>• split letterboard (a-i, j-r, s-z)</ThemedText>
               </ThemedView>
             </ThemedView>
           </ThemedView>
