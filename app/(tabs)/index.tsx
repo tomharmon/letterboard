@@ -147,14 +147,14 @@ export default function HomeScreen() {
             isExpanded && styles.displayRowExpanded,
           ]}
         >
-          <IconButton
-            name="menu"
-            iconColor={palette.text}
-            accessibilityLabel="Open menu"
-            containerStyle={[styles.iconButtonLarge, styles.menuButton]}
-            onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-          />
           <View style={styles.leftColumn}>
+            <IconButton
+              name="menu"
+              iconColor={palette.text}
+              accessibilityLabel="Open menu"
+              containerStyle={styles.iconButtonLarge}
+              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+            />
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Speak out loud"
@@ -327,16 +327,9 @@ const styles = StyleSheet.create({
     maxHeight: Dimensions.get('window').height * 0.7,
     flex: 1,
   },
-  menuButton: {
-    position: 'absolute',
-    top: 8,
-    left: 16,
-    zIndex: 10,
-  },
   leftColumn: {
     flexDirection: 'column',
     gap: 12,
-    marginLeft: 56, // Account for menu button width + gap
   },
   rightColumn: {
     flexDirection: 'column',
@@ -362,6 +355,7 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: 18,
     fontWeight: '500',
+    marginTop: 12,
   },
   keyboardWrapper: {
     flex: 1,
