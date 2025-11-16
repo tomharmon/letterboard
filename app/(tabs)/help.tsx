@@ -49,8 +49,8 @@ export default function TabTwoScreen() {
               Bug and Feedback Reports
             </ThemedText>
             <ThemedText style={styles.sectionContent}>
-              Encountering a bug or have a feature request? We'd love to hear from you! Please contact
-              us by emailing tom@harmon.tech
+              Encountering a bug or have a feature request? We&apos;d love to hear from you! Please
+              contact us by emailing tom@harmon.tech
             </ThemedText>
             <Pressable
               onPress={handleEmailPress}

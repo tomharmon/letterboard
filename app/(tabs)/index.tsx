@@ -16,16 +16,17 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { NUMERIC_LAYOUT, getKeyboardLayout } from '@/app/lib/keyboard-layouts';
+import { KeyboardControls, KeyboardGrid } from '@/components/keyboard';
 import { Colors } from '@/constants/theme';
+import { useKeyboardLayout } from '@/contexts/keyboard-layout-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-
-const COLUMNS = 6;
-const GRID_GAP = 6;
 
 export default function HomeScreen() {
   const navigation = useNavigation();
   const colorScheme = useColorScheme();
   const palette = Colors[colorScheme ?? 'light'];
+  const { layoutId } = useKeyboardLayout();
   const [text, setText] = useState('');
   const [isNumericMode, setIsNumericMode] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -34,68 +35,8 @@ export default function HomeScreen() {
   const clearAnimationRef = useRef<Animated.CompositeAnimation | null>(null);
   const [clearTrackHeight, setClearTrackHeight] = useState(0);
 
-  const letterRows = useMemo(() => {
-    if (isNumericMode) {
-      // Numpad layout: centered 3-column numpad
-      // Row 1: 7 8 9
-      // Row 2: 4 5 6
-      // Row 3: 1 2 3
-      // Row 4: 0 . , (left-aligned)
-      // Row 5: remaining symbols
-      const rows: Array<Array<string | null>> = Array.from({ length: 5 }, () =>
-        Array(COLUMNS).fill(null),
-      );
-
-      // Row 1: 7 8 9 (centered in columns 1-3)
-      rows[0][1] = '7';
-      rows[0][2] = '8';
-      rows[0][3] = '9';
-
-      // Row 2: 4 5 6 (centered in columns 1-3)
-      rows[1][1] = '4';
-      rows[1][2] = '5';
-      rows[1][3] = '6';
-
-      // Row 3: 1 2 3 (centered in columns 1-3)
-      rows[2][1] = '1';
-      rows[2][2] = '2';
-      rows[2][3] = '3';
-
-      // Row 4: 0 . , (left-aligned)
-      rows[3][1] = '0';
-      rows[3][2] = '.';
-      rows[3][3] = ',';
-
-      // Row 5: remaining symbols
-      const symbols = ['-', '/', '×', '(', ')'];
-      let symIndex = 0;
-      for (let c = 1; c < COLUMNS && symIndex < symbols.length; c++) {
-        rows[4][c] = symbols[symIndex++];
-      }
-
-      return rows;
-    } else {
-      // Desired layout:
-      // - 6 columns total
-      // - Rows 1–5 only: fill columns 1–5 with A–Y, column 6 empty except for Z
-      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-      const rows: Array<Array<string | null>> = Array.from({ length: 5 }, () =>
-        Array(COLUMNS).fill(null),
-      );
-
-      let index = 0;
-      for (let r = 0; r < rows.length; r++) {
-        for (let c = 0; c < 5; c++) {
-          rows[r][c] = alphabet[index++];
-        }
-        // rows[r][5] remains null to create the empty vertical column
-      }
-      // Place Z at the end of the fifth row (move up one row)
-      rows[4][5] = alphabet[index] ?? null;
-
-      return rows;
-    }
-  }, [isNumericMode]);
+  const selectedLayout = useMemo(() => getKeyboardLayout(layoutId), [layoutId]);
+  const activeLayout = isNumericMode ? NUMERIC_LAYOUT : selectedLayout;
 
   const words = useMemo(() => {
     if (!text.trim()) {
@@ -105,8 +46,8 @@ export default function HomeScreen() {
     return text.split(' ');
   }, [text]);
 
-  const handleLetterClick = useCallback((letter: string) => {
-    setText((prev) => prev + letter);
+  const handleLetterClick = useCallback((value: string) => {
+    setText((prev) => prev + value);
   }, []);
 
   const handleBackspace = useCallback(() => {
@@ -178,6 +119,14 @@ export default function HomeScreen() {
   const keyPressed = colorScheme === 'dark' ? '#3f3f46' : '#e5e7eb';
   const keyText = colorScheme === 'dark' ? '#ffffff' : '#111827';
   const keyBorder = colorScheme === 'dark' ? '#3f3f46' : '#d1d5db';
+  const keyColors = useMemo(
+    () => ({
+      default: keyDefault,
+      pressed: keyPressed,
+      text: keyText,
+    }),
+    [keyDefault, keyPressed, keyText],
+  );
 
   return (
     <SafeAreaView
@@ -299,100 +248,15 @@ export default function HomeScreen() {
           ]}
         >
           <View style={styles.keyboardInner}>
-            <View style={styles.letterGrid}>
-              {letterRows.map((row, rowIdx) => (
-                <View key={rowIdx} style={styles.letterRow}>
-                  {row.map((letter, colIdx) =>
-                    letter ? (
-                      <Pressable
-                        key={letter}
-                        onPress={() => handleLetterClick(letter)}
-                        accessibilityRole="button"
-                        accessibilityLabel={`Add ${letter}`}
-                        style={({ pressed }) => [
-                          styles.letterButton,
-                          { backgroundColor: keyDefault },
-                          pressed && { backgroundColor: keyPressed },
-                        ]}
-                      >
-                        <Text style={[styles.letter, { color: keyText }]}>{letter}</Text>
-                      </Pressable>
-                    ) : (
-                      <View
-                        key={`spacer-${rowIdx}-${colIdx}`}
-                        style={[styles.letterButton, { backgroundColor: 'transparent' }]}
-                        pointerEvents="none"
-                        accessibilityElementsHidden
-                        importantForAccessibility="no-hide-descendants"
-                      />
-                    )
-                  )}
-                </View>
-              ))}
-            </View>
-
-            <View style={styles.bottomRow}>
-              <View style={[styles.slot, { flex: 1 }]}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={isNumericMode ? "Switch to letters" : "Switch to numbers"}
-                  style={({ pressed }) => [
-                    styles.numberButton,
-                    { backgroundColor: keyDefault, borderColor: keyBorder },
-                    pressed && styles.pressed,
-                  ]}
-                  onPress={() => {
-                    setIsNumericMode((prev) => !prev);
-                  }}
-                >
-                  <Text style={[styles.numberButtonText, { color: keyText }]}>
-                    {isNumericMode ? 'ABC' : '123'}
-                  </Text>
-                </Pressable>
-              </View>
-              <View style={[styles.slot, { flex: 3 }]}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Add space"
-                  onPress={handleSpace}
-                  style={({ pressed }) => [
-                    styles.spaceBar,
-                    { backgroundColor: keyDefault, borderColor: keyBorder },
-                    pressed && { backgroundColor: keyPressed },
-                  ]}
-                />
-              </View>
-              <View style={[styles.slot, { flex: 1 }]}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="New line"
-                  onPress={handleEnter}
-                  style={({ pressed }) => [
-                    styles.iconButton,
-                    styles.enterButton,
-                    { backgroundColor: keyDefault },
-                    pressed && styles.pressed,
-                  ]}
-                >
-                  <MaterialCommunityIcons name="keyboard-return" size={28} color={keyText} />
-                </Pressable>
-              </View>
-              <View style={[styles.slot, { flex: 1 }]}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Delete last letter"
-                  onPress={handleBackspace}
-                  style={({ pressed }) => [
-                    styles.iconButton,
-                    styles.backspaceButton,
-                    { backgroundColor: keyDefault },
-                    pressed && styles.pressed,
-                  ]}
-                >
-                  <MaterialCommunityIcons name="backspace-outline" size={28} color={keyText} />
-                </Pressable>
-              </View>
-            </View>
+            <KeyboardGrid layout={activeLayout} onKeyPress={handleLetterClick} colors={keyColors} />
+            <KeyboardControls
+              isNumericMode={isNumericMode}
+              onToggleNumeric={() => setIsNumericMode((prev) => !prev)}
+              onSpace={handleSpace}
+              onEnter={handleEnter}
+              onBackspace={handleBackspace}
+              colors={{ ...keyColors, border: keyBorder }}
+            />
           </View>
         </View>
       </View>
@@ -517,72 +381,6 @@ const styles = StyleSheet.create({
   keyboardInner: {
     flex: 1,
     overflow: 'hidden',
-  },
-  letterGrid: {
-    flex: 1,
-    gap: 4,
-  },
-  letterRow: {
-    flex: 1,
-    flexDirection: 'row',
-    gap: GRID_GAP,
-  },
-  letterButton: {
-    flex: 1,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 0,
-  },
-  letter: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#ffffff',
-  },
-  bottomRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    marginTop: 4,
-    gap: GRID_GAP,
-  },
-  slot: {
-    flexBasis: 0,
-  },
-  numberButton: {
-    height: 64,
-    width: '100%',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#3f3f46',
-    backgroundColor: '#27272a',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  numberButtonText: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#ffffff',
-  },
-  spaceBar: {
-    height: 64,
-    width: '100%',
-    borderRadius: 12,
-    backgroundColor: '#27272a',
-    borderWidth: 1,
-    borderColor: '#3f3f46',
-  },
-  enterButton: {
-    height: 64,
-    width: '100%',
-    borderRadius: 12,
-    backgroundColor: '#27272a',
-  },
-  backspaceButton: {
-    height: 64,
-    width: '100%',
-    borderRadius: 12,
-    backgroundColor: '#27272a',
   },
   iconButton: {
     alignItems: 'center',
