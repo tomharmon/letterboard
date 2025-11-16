@@ -29,7 +29,10 @@ const LETTERBOARD_COLUMNS = 6;
 const NUMERIC_ROWS = 5;
 const NUMERIC_COLUMNS = 6;
 
-const createKey = (label: string, opts: Partial<Omit<KeyCell, 'type' | 'label' | 'id'>> = {}): KeyCell => ({
+const createKey = (
+  label: string,
+  opts: Partial<Omit<KeyCell, 'type' | 'label' | 'id'>> = {},
+): KeyCell => ({
   type: 'key',
   id: `key-${label}-${opts.value ?? label}`,
   label,
@@ -43,7 +46,9 @@ const createSpacer = (id: string, flex = 1): SpacerCell => ({
   flex,
 });
 
-const buildLetterboardRows = (): KeyboardRow[] => {
+const LETTERBOARD_PUNCTUATION = [',', '!', '?', '.'];
+
+const buildLetterboardRows = (includePunctuation = false): KeyboardRow[] => {
   const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   const rows: KeyboardRow[] = [];
   let index = 0;
@@ -52,7 +57,9 @@ const buildLetterboardRows = (): KeyboardRow[] => {
     const row: KeyboardRow = [];
     for (let c = 0; c < LETTERBOARD_COLUMNS; c++) {
       if (c === LETTERBOARD_COLUMNS - 1) {
-        if (r === 4) {
+        if (includePunctuation && r < LETTERBOARD_PUNCTUATION.length) {
+          row.push(createKey(LETTERBOARD_PUNCTUATION[r]));
+        } else if (r === 4) {
           const letter = letters[index];
           if (letter) {
             row.push(createKey(letter));
@@ -78,26 +85,34 @@ const buildLetterboardRows = (): KeyboardRow[] => {
   return rows;
 };
 
-const buildQwertyRows = (): KeyboardRow[] => {
+const buildQwertyRows = (includePunctuation = false): KeyboardRow[] => {
+  const HOME_ROW_INDENT = 0.25;
+  const BOTTOM_ROW_INDENT = 0.5;
+
   const rows: string[][] = [
     'QWERTYUIOP'.split(''),
     'ASDFGHJKL'.split(''),
     'ZXCVBNM'.split(''),
   ];
 
+  if (includePunctuation) {
+    rows[1].push('!');
+    rows[2].push(',', '.', '?');
+  }
+
   return rows.map((rowLetters, index) => {
     const row: KeyboardRow = rowLetters.map((letter) => createKey(letter));
 
     if (index === 1) {
       // home row indent
-      row.unshift(createSpacer('qwerty-home-indent-left', 0.5));
-      row.push(createSpacer('qwerty-home-indent-right', 0.5));
+      row.unshift(createSpacer('qwerty-home-indent-left', HOME_ROW_INDENT));
+      row.push(createSpacer('qwerty-home-indent-right', HOME_ROW_INDENT));
     }
 
     if (index === 2) {
       // bottom row wider indent
-      row.unshift(createSpacer('qwerty-bottom-indent-left', 1));
-      row.push(createSpacer('qwerty-bottom-indent-right', 1));
+      row.unshift(createSpacer('qwerty-bottom-indent-left', BOTTOM_ROW_INDENT));
+      row.push(createSpacer('qwerty-bottom-indent-right', BOTTOM_ROW_INDENT));
     }
 
     return row;
@@ -174,6 +189,33 @@ export const keyboardLayoutOptions = Object.values(KEYBOARD_LAYOUTS).map((layout
   description: layout.description,
 }));
 
-export const getKeyboardLayout = (id: KeyboardLayoutId): KeyboardLayout =>
-  KEYBOARD_LAYOUTS[id] ?? LETTERBOARD_LAYOUT;
+type GetKeyboardLayoutOptions = {
+  includePunctuation?: boolean;
+};
+
+export const getKeyboardLayout = (
+  id: KeyboardLayoutId,
+  options: GetKeyboardLayoutOptions = {},
+): KeyboardLayout => {
+  const includePunctuation = options.includePunctuation ?? false;
+
+  if (id === 'letterboard') {
+    return {
+      ...LETTERBOARD_LAYOUT,
+      rows: buildLetterboardRows(includePunctuation),
+    };
+  }
+
+  if (id === 'qwerty') {
+    return {
+      ...QWERTY_LAYOUT,
+      rows: buildQwertyRows(includePunctuation),
+    };
+  }
+
+  return {
+    ...LETTERBOARD_LAYOUT,
+    rows: buildLetterboardRows(includePunctuation),
+  };
+};
 

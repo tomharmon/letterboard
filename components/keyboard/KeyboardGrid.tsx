@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
-import type { KeyboardLayout } from '@/app/lib/keyboard-layouts';
+import type { KeyboardLayout } from '@/lib/keyboard-layouts';
 
 import { KeyboardKey, type KeyColors } from './KeyboardKey';
 import { SpacerKey } from './SpacerKey';

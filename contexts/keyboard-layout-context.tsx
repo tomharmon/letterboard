@@ -9,18 +9,18 @@ import {
     type ReactNode,
 } from 'react';
 
-import {
-    DEFAULT_LAYOUT_ID,
-    type KeyboardLayoutId,
-} from '@/app/lib/keyboard-layouts';
+import { DEFAULT_LAYOUT_ID, type KeyboardLayoutId } from '@/lib/keyboard-layouts';
 
 type KeyboardLayoutContextValue = {
   layoutId: KeyboardLayoutId;
+  includePunctuation: boolean;
   isReady: boolean;
   setLayoutId: (id: KeyboardLayoutId) => void;
+  setIncludePunctuation: (value: boolean) => void;
 };
 
-const STORAGE_KEY = 'letterboard.keyboardLayout';
+const LAYOUT_STORAGE_KEY = 'letterboard.keyboardLayout';
+const PUNCTUATION_STORAGE_KEY = 'letterboard.includePunctuation';
 
 const KeyboardLayoutContext = createContext<KeyboardLayoutContextValue | undefined>(undefined);
 
@@ -30,24 +30,40 @@ type ProviderProps = {
 
 export function KeyboardLayoutProvider({ children }: ProviderProps) {
   const [layoutId, setLayoutState] = useState<KeyboardLayoutId>(DEFAULT_LAYOUT_ID);
+  const [includePunctuation, setIncludePunctuationState] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY)
-      .then((saved) => {
-        if (saved === 'letterboard' || saved === 'qwerty') {
-          setLayoutState(saved);
+    AsyncStorage.multiGet([LAYOUT_STORAGE_KEY, PUNCTUATION_STORAGE_KEY])
+      .then(([savedLayoutEntry, savedPunctuationEntry]) => {
+        const savedLayout = savedLayoutEntry?.[1];
+        const savedIncludePunctuation = savedPunctuationEntry?.[1];
+
+        if (savedLayout === 'letterboard' || savedLayout === 'qwerty') {
+          setLayoutState(savedLayout);
+        }
+
+        if (savedIncludePunctuation === 'true') {
+          setIncludePunctuationState(true);
+        } else if (savedIncludePunctuation === 'false') {
+          setIncludePunctuationState(false);
         }
       })
       .catch((error) => {
-        console.warn('Failed to load keyboard layout preference', error);
+        console.warn('Failed to load keyboard preferences', error);
       })
       .finally(() => setIsReady(true));
   }, []);
 
   const persistLayout = useCallback((id: KeyboardLayoutId) => {
-    AsyncStorage.setItem(STORAGE_KEY, id).catch((error) => {
+    AsyncStorage.setItem(LAYOUT_STORAGE_KEY, id).catch((error) => {
       console.warn('Failed to save keyboard layout preference', error);
+    });
+  }, []);
+
+  const persistIncludePunctuation = useCallback((value: boolean) => {
+    AsyncStorage.setItem(PUNCTUATION_STORAGE_KEY, value ? 'true' : 'false').catch((error) => {
+      console.warn('Failed to save punctuation preference', error);
     });
   }, []);
 
@@ -59,13 +75,23 @@ export function KeyboardLayoutProvider({ children }: ProviderProps) {
     [persistLayout],
   );
 
+  const setIncludePunctuation = useCallback(
+    (value: boolean) => {
+      setIncludePunctuationState(value);
+      persistIncludePunctuation(value);
+    },
+    [persistIncludePunctuation],
+  );
+
   const value = useMemo(
     () => ({
       layoutId,
+      includePunctuation,
       isReady,
       setLayoutId,
+      setIncludePunctuation,
     }),
-    [layoutId, isReady, setLayoutId],
+    [layoutId, includePunctuation, isReady, setLayoutId, setIncludePunctuation],
   );
 
   return <KeyboardLayoutContext.Provider value={value}>{children}</KeyboardLayoutContext.Provider>;

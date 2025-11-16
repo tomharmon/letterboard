@@ -16,17 +16,17 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { NUMERIC_LAYOUT, getKeyboardLayout } from '@/app/lib/keyboard-layouts';
 import { KeyboardControls, KeyboardGrid } from '@/components/keyboard';
 import { Colors } from '@/constants/theme';
 import { useKeyboardLayout } from '@/contexts/keyboard-layout-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { NUMERIC_LAYOUT, getKeyboardLayout } from '@/lib/keyboard-layouts';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
   const colorScheme = useColorScheme();
   const palette = Colors[colorScheme ?? 'light'];
-  const { layoutId } = useKeyboardLayout();
+  const { layoutId, includePunctuation } = useKeyboardLayout();
   const [text, setText] = useState('');
   const [isNumericMode, setIsNumericMode] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -35,7 +35,10 @@ export default function HomeScreen() {
   const clearAnimationRef = useRef<Animated.CompositeAnimation | null>(null);
   const [clearTrackHeight, setClearTrackHeight] = useState(0);
 
-  const selectedLayout = useMemo(() => getKeyboardLayout(layoutId), [layoutId]);
+  const selectedLayout = useMemo(
+    () => getKeyboardLayout(layoutId, { includePunctuation }),
+    [layoutId, includePunctuation],
+  );
   const activeLayout = isNumericMode ? NUMERIC_LAYOUT : selectedLayout;
 
   const words = useMemo(() => {

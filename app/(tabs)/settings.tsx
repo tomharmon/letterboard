@@ -1,21 +1,22 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Colors } from '@/constants/theme';
+import { useKeyboardLayout } from '@/contexts/keyboard-layout-context';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import {
   keyboardLayoutOptions,
   type KeyboardLayoutId,
-} from '@/app/lib/keyboard-layouts';
-import { useKeyboardLayout } from '@/contexts/keyboard-layout-context';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+} from '@/lib/keyboard-layouts';
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
   const colorScheme = useColorScheme();
   const palette = Colors[colorScheme ?? 'light'];
-  const { layoutId, setLayoutId, isReady } = useKeyboardLayout();
+  const { layoutId, includePunctuation, setLayoutId, setIncludePunctuation, isReady } =
+    useKeyboardLayout();
   const mutedText = colorScheme === 'dark' ? '#a1a1aa' : '#4b5563';
   const surface = colorScheme === 'dark' ? '#1f2937' : '#f3f4f6';
   const borderColor = colorScheme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.12)';
@@ -85,6 +86,29 @@ export default function SettingsScreen() {
               );
             })}
           </View>
+
+          <View style={styles.toggleRow}>
+            <View style={styles.toggleTextContainer}>
+              <Text style={[styles.optionLabel, { color: palette.text }]}>Include punctuation</Text>
+              <Text style={[styles.optionDescription, { color: mutedText }]}>
+                Adds , ! ? . keys to the keyboard layout.
+              </Text>
+            </View>
+            <Switch
+              accessibilityRole='switch'
+              accessibilityLabel='Include punctuation keys'
+              value={includePunctuation}
+              onValueChange={setIncludePunctuation}
+              disabled={!isReady}
+              trackColor={{
+                false: borderColor,
+                true: palette.tint,
+              }}
+              thumbColor={includePunctuation ? '#ffffff' : '#d4d4d8'}
+              ios_backgroundColor={borderColor}
+              style={styles.toggleSwitch}
+            />
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -150,6 +174,19 @@ const styles = StyleSheet.create({
   optionDescription: {
     fontSize: 14,
     marginTop: 2,
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 4,
+  },
+  toggleTextContainer: {
+    flex: 1,
+    marginRight: 12,
+  },
+  toggleSwitch: {
+    transform: [{ scale: 0.92 }],
   },
   optionIndicator: {
     width: 24,
