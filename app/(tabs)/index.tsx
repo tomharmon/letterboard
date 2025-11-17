@@ -1,5 +1,5 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Speech from '@mhpdev/react-native-speech';
+import * as Speech from 'expo-speech';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useCallback, useMemo, useRef, useState, type ComponentProps } from 'react';
 import {
@@ -103,9 +103,11 @@ export default function HomeScreen() {
 
   const handleSpeak = useCallback(() => {
     const textToSpeak = text || 'Nothing to say yet';
-    Speech.speak(textToSpeak).catch((error) => {
+    try {
+      Speech.speak(textToSpeak);
+    } catch (error) {
       console.error('Speech error:', error);
-    });
+    }
   }, [text]);
 
   const handleToggleExpand = useCallback(() => {

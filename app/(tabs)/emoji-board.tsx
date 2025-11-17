@@ -1,5 +1,5 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Speech from '@mhpdev/react-native-speech';
+import * as Speech from 'expo-speech';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { Dimensions, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -72,7 +72,13 @@ export default function EmojiBoardScreen() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={`${item.emotion} emoji`}
-            onPress={() => Speech.speak(item.emotion).catch((e) => console.error('Speech error:', e))}
+            onPress={() => {
+              try {
+                Speech.speak(item.emotion);
+              } catch (error) {
+                console.error('Speech error:', error);
+              }
+            }}
             style={({ pressed }) => [
               styles.key,
               {

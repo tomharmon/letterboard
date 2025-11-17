@@ -1,5 +1,5 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Speech from '@mhpdev/react-native-speech';
+import * as Speech from 'expo-speech';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useCallback } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -16,9 +16,11 @@ export default function ChoiceBoardScreen() {
 
   const handleCardPress = useCallback((choice: 'A' | 'B' | 'C') => {
     const textToSpeak = `choice ${choice}`;
-    Speech.speak(textToSpeak).catch((error) => {
+    try {
+      Speech.speak(textToSpeak);
+    } catch (error) {
       console.error('Speech error:', error);
-    });
+    }
   }, []);
 
   const cardBackground = colorScheme === 'dark' ? '#1f2937' : '#ffffff';
