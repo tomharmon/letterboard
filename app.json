@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "letterboard",
-    "slug": "letterboard",
+    "name": "Spelling Board",
+    "slug": "spelling-board",
     "version": "1.0.0",
     "orientation": "landscape",
     "icon": "./assets/images/icon.png",
-    "scheme": "letterboard",
+    "scheme": "spellingboard",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.harmontech.letterboard",
+      "bundleIdentifier": "com.harmontech.spellingboard",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "UISupportedInterfaceOrientations": [
@@ -32,7 +32,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.harmontech.letterboard"
+      "package": "com.harmontech.spellingboard"
     },
     "web": {
       "output": "static",

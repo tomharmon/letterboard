@@ -126,7 +126,7 @@ export default function TabTwoScreen() {
                 </ThemedText>
                 <ThemedText style={styles.subFeatureItem}>• spell check</ThemedText>
                 <ThemedText style={styles.subFeatureItem}>• word prediction</ThemedText>
-                <ThemedText style={styles.subFeatureItem}>• split letterboard (a-i, j-r, s-z)</ThemedText>
+                <ThemedText style={styles.subFeatureItem}>• split Spelling Board (a-i, j-r, s-z)</ThemedText>
               </ThemedView>
             </ThemedView>
           </ThemedView>

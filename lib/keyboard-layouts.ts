@@ -16,7 +16,7 @@ export type KeyboardCell = SpacerCell | KeyCell;
 
 export type KeyboardRow = KeyboardCell[];
 
-export type KeyboardLayoutId = 'letterboard' | 'qwerty';
+export type KeyboardLayoutId = 'spelling-board' | 'qwerty';
 
 export type KeyboardLayout = {
   id: KeyboardLayoutId | 'numeric' | 'qwerty-numeric';
@@ -25,7 +25,7 @@ export type KeyboardLayout = {
   description?: string;
 };
 
-const LETTERBOARD_COLUMNS = 6;
+const SPELLING_BOARD_COLUMNS = 6;
 const NUMERIC_ROWS = 5;
 const NUMERIC_COLUMNS = 6;
 
@@ -46,28 +46,28 @@ const createSpacer = (id: string, flex = 1): SpacerCell => ({
   flex,
 });
 
-const LETTERBOARD_PUNCTUATION = [',', '!', '?', '.'];
+const SPELLING_BOARD_PUNCTUATION = [',', '!', '?', '.'];
 
-const buildLetterboardRows = (includePunctuation = false): KeyboardRow[] => {
+const buildSpellingBoardRows = (includePunctuation = false): KeyboardRow[] => {
   const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   const rows: KeyboardRow[] = [];
   let index = 0;
 
   for (let r = 0; r < 5; r++) {
     const row: KeyboardRow = [];
-    for (let c = 0; c < LETTERBOARD_COLUMNS; c++) {
-      if (c === LETTERBOARD_COLUMNS - 1) {
-        if (includePunctuation && r < LETTERBOARD_PUNCTUATION.length) {
-          row.push(createKey(LETTERBOARD_PUNCTUATION[r]));
+    for (let c = 0; c < SPELLING_BOARD_COLUMNS; c++) {
+      if (c === SPELLING_BOARD_COLUMNS - 1) {
+        if (includePunctuation && r < SPELLING_BOARD_PUNCTUATION.length) {
+          row.push(createKey(SPELLING_BOARD_PUNCTUATION[r]));
         } else if (r === 4) {
           const letter = letters[index];
           if (letter) {
             row.push(createKey(letter));
           } else {
-            row.push(createSpacer(`letterboard-spacer-${r}-${c}`));
+            row.push(createSpacer(`spelling-board-spacer-${r}-${c}`));
           }
         } else {
-          row.push(createSpacer(`letterboard-spacer-${r}-${c}`));
+          row.push(createSpacer(`spelling-board-spacer-${r}-${c}`));
         }
         continue;
       }
@@ -76,7 +76,7 @@ const buildLetterboardRows = (includePunctuation = false): KeyboardRow[] => {
       if (letter) {
         row.push(createKey(letter));
       } else {
-        row.push(createSpacer(`letterboard-spacer-${r}-${c}`));
+        row.push(createSpacer(`spelling-board-spacer-${r}-${c}`));
       }
     }
     rows.push(row);
@@ -178,11 +178,11 @@ const buildNumericRows = (): KeyboardRow[] => {
   return rows;
 };
 
-export const LETTERBOARD_LAYOUT: KeyboardLayout = {
-  id: 'letterboard',
-  name: 'Letterboard',
-  rows: buildLetterboardRows(),
-  description: 'Alphabetical letterboard layout (columns A–Z).',
+export const SPELLING_BOARD_LAYOUT: KeyboardLayout = {
+  id: 'spelling-board',
+  name: 'Spelling Board',
+  rows: buildSpellingBoardRows(),
+  description: 'Alphabetical Spelling Board layout (columns A–Z).',
 };
 
 export const QWERTY_LAYOUT: KeyboardLayout = {
@@ -205,11 +205,11 @@ export const QWERTY_NUMERIC_LAYOUT: KeyboardLayout = {
 };
 
 export const KEYBOARD_LAYOUTS: Record<KeyboardLayoutId, KeyboardLayout> = {
-  letterboard: LETTERBOARD_LAYOUT,
+  'spelling-board': SPELLING_BOARD_LAYOUT,
   qwerty: QWERTY_LAYOUT,
 };
 
-export const DEFAULT_LAYOUT_ID: KeyboardLayoutId = 'letterboard';
+export const DEFAULT_LAYOUT_ID: KeyboardLayoutId = 'spelling-board';
 
 export const keyboardLayoutOptions = Object.values(KEYBOARD_LAYOUTS).map((layout) => ({
   id: layout.id,
@@ -227,10 +227,10 @@ export const getKeyboardLayout = (
 ): KeyboardLayout => {
   const includePunctuation = options.includePunctuation ?? false;
 
-  if (id === 'letterboard') {
+  if (id === 'spelling-board') {
     return {
-      ...LETTERBOARD_LAYOUT,
-      rows: buildLetterboardRows(includePunctuation),
+      ...SPELLING_BOARD_LAYOUT,
+      rows: buildSpellingBoardRows(includePunctuation),
     };
   }
 
@@ -242,8 +242,8 @@ export const getKeyboardLayout = (
   }
 
   return {
-    ...LETTERBOARD_LAYOUT,
-    rows: buildLetterboardRows(includePunctuation),
+    ...SPELLING_BOARD_LAYOUT,
+    rows: buildSpellingBoardRows(includePunctuation),
   };
 };
 

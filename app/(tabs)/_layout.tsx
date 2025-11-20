@@ -25,7 +25,7 @@ export default function TabLayout() {
       <Drawer.Screen
         name="index"
         options={{
-          title: 'Letterboard',
+          title: 'Spelling Board',
           drawerIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="alphabetical-variant" color={color} size={size} />
           ),

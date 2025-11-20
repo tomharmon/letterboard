@@ -19,8 +19,8 @@ type KeyboardLayoutContextValue = {
   setIncludePunctuation: (value: boolean) => void;
 };
 
-const LAYOUT_STORAGE_KEY = 'letterboard.keyboardLayout';
-const PUNCTUATION_STORAGE_KEY = 'letterboard.includePunctuation';
+const LAYOUT_STORAGE_KEY = 'spelling-board.keyboardLayout';
+const PUNCTUATION_STORAGE_KEY = 'spelling-board.includePunctuation';
 
 const KeyboardLayoutContext = createContext<KeyboardLayoutContextValue | undefined>(undefined);
 
@@ -39,7 +39,7 @@ export function KeyboardLayoutProvider({ children }: ProviderProps) {
         const savedLayout = savedLayoutEntry?.[1];
         const savedIncludePunctuation = savedPunctuationEntry?.[1];
 
-        if (savedLayout === 'letterboard' || savedLayout === 'qwerty') {
+        if (savedLayout === 'spelling-board' || savedLayout === 'qwerty') {
           setLayoutState(savedLayout);
         }
 
