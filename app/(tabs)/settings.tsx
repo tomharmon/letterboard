@@ -22,6 +22,9 @@ export default function SettingsScreen() {
   const borderColor = colorScheme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.12)';
   const selectedBackground =
     colorScheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(10,126,164,0.08)';
+  const accentColor = colorScheme === 'dark' ? '#0ea5e9' : palette.tint;
+  const accentTrackColor = colorScheme === 'dark' ? 'rgba(14,165,233,0.45)' : palette.tint;
+  const accentThumbColor = colorScheme === 'dark' ? '#f8fafc' : '#ffffff';
   const handleEmailPress = () => {
     Linking.openURL('mailto:tom@harmon.tech');
   };
@@ -105,9 +108,9 @@ export default function SettingsScreen() {
               disabled={!isReady}
               trackColor={{
                 false: borderColor,
-                true: palette.tint,
+                true: accentTrackColor,
               }}
-              thumbColor={includePunctuation ? '#ffffff' : '#d4d4d8'}
+              thumbColor={includePunctuation ? accentThumbColor : '#d4d4d8'}
               ios_backgroundColor={borderColor}
               style={styles.toggleSwitch}
             />
@@ -129,7 +132,7 @@ export default function SettingsScreen() {
             style={({ pressed }) => [
               styles.emailButton,
               {
-                backgroundColor: palette.tint,
+                backgroundColor: accentColor,
                 opacity: pressed ? 0.7 : 1,
               },
             ]}

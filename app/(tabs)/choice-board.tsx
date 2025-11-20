@@ -23,19 +23,17 @@ export default function ChoiceBoardScreen() {
     }
   }, []);
 
+  const screenBackground = colorScheme === 'dark' ? '#18181b' : '#f3f4f6';
   const cardBackground = colorScheme === 'dark' ? '#1f2937' : '#ffffff';
   const cardBorder = colorScheme === 'dark' ? '#374151' : '#e5e7eb';
   const cardText = palette.text;
 
   return (
     <SafeAreaView
-      style={[
-        styles.safeArea,
-        { backgroundColor: colorScheme === 'dark' ? '#111827' : '#f3f4f6' },
-      ]}
+      style={[styles.safeArea, { backgroundColor: screenBackground }]}
       edges={['top', 'left', 'right']}
     >
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: screenBackground }]}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Open menu"
@@ -48,7 +46,7 @@ export default function ChoiceBoardScreen() {
           <MaterialCommunityIcons name="menu" size={28} color={palette.text} />
         </Pressable>
       </View>
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: screenBackground }]}>
         <View style={styles.cardsContainer}>
           {(['A', 'B', 'C'] as const).map((choice) => (
             <Pressable

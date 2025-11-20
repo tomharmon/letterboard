@@ -32,6 +32,7 @@ export default function EmojiBoardScreen() {
   const navigation = useNavigation();
   const colorScheme = useColorScheme();
   const palette = Colors[colorScheme ?? 'light'];
+  const screenBackground = colorScheme === 'dark' ? '#18181b' : '#f3f4f6';
   
   // Calculate key width to ensure consistent sizing across all rows
   const screenWidth = Dimensions.get('window').width;
@@ -43,13 +44,10 @@ export default function EmojiBoardScreen() {
 
   return (
     <SafeAreaView
-      style={[
-        styles.safeArea,
-        { backgroundColor: colorScheme === 'dark' ? '#111827' : '#f3f4f6' },
-      ]}
+      style={[styles.safeArea, { backgroundColor: screenBackground }]}
       edges={['top', 'left', 'right']}
     >
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: screenBackground }]}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Open menu"
@@ -67,7 +65,7 @@ export default function EmojiBoardScreen() {
         keyExtractor={(item) => item.emoji}
         numColumns={5}
         columnWrapperStyle={styles.row}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, { backgroundColor: screenBackground }]}
         renderItem={({ item }) => (
           <Pressable
             accessibilityRole="button"
