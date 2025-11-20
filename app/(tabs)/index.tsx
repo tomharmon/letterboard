@@ -1,6 +1,6 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import * as Speech from 'expo-speech';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
+import * as Speech from 'expo-speech';
 import { useCallback, useMemo, useRef, useState, type ComponentProps } from 'react';
 import {
   Animated,
@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { KeyboardControls, KeyboardGrid } from '@/components/keyboard';
+import { KEYBOARD_CONTROL_BASE_HEIGHT, KeyboardControls, KeyboardGrid } from '@/components/keyboard';
 import { Colors } from '@/constants/theme';
 import { useKeyboardLayout } from '@/contexts/keyboard-layout-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -40,6 +40,10 @@ export default function HomeScreen() {
     [layoutId, includePunctuation],
   );
   const activeLayout = isNumericMode ? NUMERIC_LAYOUT : selectedLayout;
+  const isQwertyLayout = selectedLayout.id === 'qwerty';
+  const controlRowHeight = isQwertyLayout
+    ? KEYBOARD_CONTROL_BASE_HEIGHT * 1.3
+    : KEYBOARD_CONTROL_BASE_HEIGHT;
 
   const words = useMemo(() => {
     if (!text.trim()) {
@@ -261,6 +265,7 @@ export default function HomeScreen() {
               onEnter={handleEnter}
               onBackspace={handleBackspace}
               colors={{ ...keyColors, border: keyBorder }}
+              controlHeight={controlRowHeight}
             />
           </View>
         </View>

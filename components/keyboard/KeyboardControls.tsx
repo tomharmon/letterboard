@@ -3,6 +3,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { KeyColors } from './KeyboardKey';
 
+export const KEYBOARD_CONTROL_BASE_HEIGHT = 64;
+
 type Props = {
   isNumericMode: boolean;
   onToggleNumeric: () => void;
@@ -10,6 +12,7 @@ type Props = {
   onEnter: () => void;
   onBackspace: () => void;
   colors: KeyColors & { border: string };
+  controlHeight?: number;
 };
 
 export function KeyboardControls({
@@ -19,7 +22,11 @@ export function KeyboardControls({
   onEnter,
   onBackspace,
   colors,
+  controlHeight,
 }: Props) {
+  const resolvedControlHeight = controlHeight ?? KEYBOARD_CONTROL_BASE_HEIGHT;
+  const heightStyle = { height: resolvedControlHeight };
+
   return (
     <View style={styles.container}>
       <View style={[styles.slot, { flex: 1 }]}>
@@ -29,6 +36,7 @@ export function KeyboardControls({
           style={({ pressed }) => [
             styles.toggleButton,
             { backgroundColor: colors.default, borderColor: colors.border },
+            heightStyle,
             pressed && styles.pressed,
           ]}
           onPress={onToggleNumeric}
@@ -44,6 +52,7 @@ export function KeyboardControls({
           style={({ pressed }) => [
             styles.spaceBar,
             { backgroundColor: colors.default, borderColor: colors.border },
+            heightStyle,
             pressed && { backgroundColor: colors.pressed },
           ]}
         />
@@ -56,6 +65,7 @@ export function KeyboardControls({
           style={({ pressed }) => [
             styles.iconButton,
             { backgroundColor: colors.default },
+            heightStyle,
             pressed && styles.pressed,
           ]}
         >
@@ -70,6 +80,7 @@ export function KeyboardControls({
           style={({ pressed }) => [
             styles.iconButton,
             { backgroundColor: colors.default },
+            heightStyle,
             pressed && styles.pressed,
           ]}
         >
@@ -92,7 +103,6 @@ const styles = StyleSheet.create({
     flexBasis: 0,
   },
   toggleButton: {
-    height: 64,
     width: '100%',
     borderRadius: 12,
     borderWidth: 1,
@@ -104,13 +114,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   spaceBar: {
-    height: 64,
     width: '100%',
     borderRadius: 12,
     borderWidth: 1,
   },
   iconButton: {
-    height: 64,
     width: '100%',
     borderRadius: 12,
     alignItems: 'center',
