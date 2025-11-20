@@ -58,15 +58,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Drawer.Screen
-        name="help"
-        options={{
-          title: 'Help',
-          drawerIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="help-circle-outline" color={color} size={size} />
-          ),
-        }}
-      />
     </Drawer>
   );
 }

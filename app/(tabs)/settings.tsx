@@ -1,6 +1,6 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Colors } from '@/constants/theme';
@@ -22,6 +22,9 @@ export default function SettingsScreen() {
   const borderColor = colorScheme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.12)';
   const selectedBackground =
     colorScheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(10,126,164,0.08)';
+  const handleEmailPress = () => {
+    Linking.openURL('mailto:tom@harmon.tech');
+  };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}>
@@ -110,6 +113,31 @@ export default function SettingsScreen() {
             />
           </View>
         </View>
+
+        <View style={[styles.card, { backgroundColor: surface, borderColor }]}>
+          <Text style={[styles.cardTitle, { color: palette.text }]}>Bug reports & feedback</Text>
+          <Text style={[styles.cardSubtitle, { color: mutedText }]}>
+            Encountering a bug or have a feature request? We&apos;d love to hear from you!
+          </Text>
+          <Text style={[styles.feedbackDescription, { color: mutedText }]}>
+            Please contact us by emailing tom@harmon.tech
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Send email to tom@harmon.tech"
+            onPress={handleEmailPress}
+            style={({ pressed }) => [
+              styles.emailButton,
+              {
+                backgroundColor: palette.tint,
+                opacity: pressed ? 0.7 : 1,
+              },
+            ]}
+          >
+            <MaterialCommunityIcons name="email-outline" size={18} color="#fff" />
+            <Text style={styles.emailButtonText}>tom@harmon.tech</Text>
+          </Pressable>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -175,6 +203,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 2,
   },
+  feedbackDescription: {
+    fontSize: 14,
+  },
   toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -197,6 +228,23 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.7,
+  },
+  emailButton: {
+    marginTop: 8,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'center',
+    width: '60%',
+    justifyContent: 'center',
+  },
+  emailButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
