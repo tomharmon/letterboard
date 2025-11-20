@@ -19,7 +19,7 @@ export type KeyboardRow = KeyboardCell[];
 export type KeyboardLayoutId = 'letterboard' | 'qwerty';
 
 export type KeyboardLayout = {
-  id: KeyboardLayoutId | 'numeric';
+  id: KeyboardLayoutId | 'numeric' | 'qwerty-numeric';
   name: string;
   rows: KeyboardRow[];
   description?: string;
@@ -119,6 +119,28 @@ const buildQwertyRows = (includePunctuation = false): KeyboardRow[] => {
   });
 };
 
+const buildQwertyNumericRows = (): KeyboardRow[] => {
+  const BOTTOM_ROW_INDENT = 0.75;
+  const rows: KeyboardRow[] = [];
+
+  // Standard number row
+  rows.push('1234567890'.split('').map((digit) => createKey(digit)));
+
+  // Common punctuation row
+  const punctuationRow = ['-', '/', ':', ';', '(', ')', '$', '&', '@', '"'];
+  rows.push(punctuationRow.map((symbol) => createKey(symbol)));
+
+  // Bottom row centered punctuation
+  const bottomRowSymbols = ['.', ',', '?', '!', "'", '+', '='];
+  rows.push([
+    createSpacer('qwerty-numeric-bottom-indent-left', BOTTOM_ROW_INDENT),
+    ...bottomRowSymbols.map((symbol) => createKey(symbol)),
+    createSpacer('qwerty-numeric-bottom-indent-right', BOTTOM_ROW_INDENT),
+  ]);
+
+  return rows;
+};
+
 const buildNumericRows = (): KeyboardRow[] => {
   const rows: KeyboardRow[] = Array.from({ length: NUMERIC_ROWS }, () => []);
 
@@ -174,6 +196,12 @@ export const NUMERIC_LAYOUT: KeyboardLayout = {
   id: 'numeric',
   name: 'Numbers & Symbols',
   rows: buildNumericRows(),
+};
+
+export const QWERTY_NUMERIC_LAYOUT: KeyboardLayout = {
+  id: 'qwerty-numeric',
+  name: 'QWERTY Numbers & Symbols',
+  rows: buildQwertyNumericRows(),
 };
 
 export const KEYBOARD_LAYOUTS: Record<KeyboardLayoutId, KeyboardLayout> = {

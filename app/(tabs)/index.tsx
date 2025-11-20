@@ -20,7 +20,7 @@ import { KEYBOARD_CONTROL_BASE_HEIGHT, KeyboardControls, KeyboardGrid } from '@/
 import { Colors } from '@/constants/theme';
 import { useKeyboardLayout } from '@/contexts/keyboard-layout-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { NUMERIC_LAYOUT, getKeyboardLayout } from '@/lib/keyboard-layouts';
+import { NUMERIC_LAYOUT, QWERTY_NUMERIC_LAYOUT, getKeyboardLayout } from '@/lib/keyboard-layouts';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -39,8 +39,13 @@ export default function HomeScreen() {
     () => getKeyboardLayout(layoutId, { includePunctuation }),
     [layoutId, includePunctuation],
   );
-  const activeLayout = isNumericMode ? NUMERIC_LAYOUT : selectedLayout;
-  const isQwertyLayout = selectedLayout.id === 'qwerty';
+  const isQwertyLayout = layoutId === 'qwerty';
+  const activeLayout = useMemo(() => {
+    if (isNumericMode) {
+      return isQwertyLayout ? QWERTY_NUMERIC_LAYOUT : NUMERIC_LAYOUT;
+    }
+    return selectedLayout;
+  }, [isNumericMode, isQwertyLayout, selectedLayout]);
   const controlRowHeight = isQwertyLayout
     ? KEYBOARD_CONTROL_BASE_HEIGHT * 1.3
     : KEYBOARD_CONTROL_BASE_HEIGHT;
