@@ -144,13 +144,10 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView
-      style={[
-        styles.safeArea,
-        { backgroundColor: colorScheme === 'dark' ? '#111827' : '#f3f4f6' },
-      ]}
+      style={[styles.safeArea, { backgroundColor: keyboardBackground }]}
       edges={['top', 'left', 'right']}
     >
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: keyboardBackground }]}>
         <View
           style={[
             styles.displayRow,
