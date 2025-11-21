@@ -29,7 +29,7 @@ export default function SettingsScreen() {
     Linking.openURL('mailto:tom@harmon.tech');
   };
   const handlePrivacyPolicyPress = () => {
-    Linking.openURL('https://github.com/tomharmon/letterboard/blob/main/PRIVACY-POLICY.md');
+    Linking.openURL('https://github.com/tomharmon/letterboard/blob/efddc0c3f7f2f5207fb0b04b96052724b64812fa/PRIVACY-POLICY.md');
   };
 
   return (
