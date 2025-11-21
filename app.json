@@ -11,16 +11,9 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.harmontech.spellingboard",
+      "requireFullScreen": true,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false,
-        "UISupportedInterfaceOrientations": [
-          "UIInterfaceOrientationLandscapeLeft",
-          "UIInterfaceOrientationLandscapeRight"
-        ],
-        "UISupportedInterfaceOrientations~ipad": [
-          "UIInterfaceOrientationLandscapeLeft",
-          "UIInterfaceOrientationLandscapeRight"
-        ]
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {

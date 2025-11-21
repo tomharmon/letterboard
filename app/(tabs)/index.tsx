@@ -3,13 +3,17 @@ import { DrawerActions, useNavigation } from '@react-navigation/native';
 import * as Speech from 'expo-speech';
 import { useCallback, useMemo, useRef, useState, type ComponentProps } from 'react';
 import {
+  ActionSheetIOS,
+  Alert,
   Animated,
   Dimensions,
   Easing,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  ToastAndroid,
   View,
   type StyleProp,
   type ViewStyle,
@@ -21,6 +25,7 @@ import { Colors } from '@/constants/theme';
 import { useKeyboardLayout } from '@/contexts/keyboard-layout-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { NUMERIC_LAYOUT, QWERTY_NUMERIC_LAYOUT, getKeyboardLayout } from '@/lib/keyboard-layouts';
+import * as Clipboard from 'expo-clipboard';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -57,6 +62,7 @@ export default function HomeScreen() {
 
     return text.split(' ');
   }, [text]);
+  const hasMessage = words.length > 0;
 
   const handleLetterClick = useCallback((value: string) => {
     setText((prev) => prev + value);
@@ -123,6 +129,49 @@ export default function HomeScreen() {
     setIsExpanded((prev) => !prev);
   }, []);
 
+  const handleCopyText = useCallback(async () => {
+    if (!hasMessage) {
+      return;
+    }
+
+    try {
+      await Clipboard.setStringAsync(text);
+      if (Platform.OS === 'android') {
+        ToastAndroid.show('Copied to clipboard', ToastAndroid.SHORT);
+      } else if (Platform.OS === 'web') {
+        Alert.alert('Copied to clipboard');
+      }
+    } catch (error) {
+      console.error('Clipboard error:', error);
+    }
+  }, [hasMessage, text]);
+
+  const handleDisplayLongPress = useCallback(() => {
+    if (!hasMessage) {
+      return;
+    }
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Copy message', 'Cancel'],
+          cancelButtonIndex: 1,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 0) {
+            handleCopyText();
+          }
+        },
+      );
+      return;
+    }
+
+    Alert.alert('Message options', undefined, [
+      { text: 'Copy message', onPress: handleCopyText },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  }, [handleCopyText, hasMessage]);
+
   const mutedText = colorScheme === 'dark' ? '#d4d4d8' : '#6b7280';
   const neutralSurface = colorScheme === 'dark' ? '#1f2937' : '#f3f4f6';
   const destructiveSurface = colorScheme === 'dark' ? '#4b5563' : '#4b5563';
@@ -186,15 +235,29 @@ export default function HomeScreen() {
             contentContainerStyle={styles.textContainerContent}
             showsVerticalScrollIndicator={true}
           >
-            {words.length === 0 ? (
-              <Text style={[styles.placeholderText, { color: mutedText }]}>
-                Tap letters to start building a message.
-              </Text>
-            ) : (
-              <Text style={[styles.displayText, { color: palette.text }]}>
-                {text}
-              </Text>
-            )}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Message display area"
+              accessibilityHint="Long press to copy the message"
+              disabled={!hasMessage}
+              delayLongPress={400}
+              onLongPress={handleDisplayLongPress}
+              android_ripple={{ color: 'transparent' }}
+              style={({ pressed }) => [
+                styles.displayPressable,
+                pressed && hasMessage && styles.displayPressableActive,
+              ]}
+            >
+              {hasMessage ? (
+                <Text style={[styles.displayText, { color: palette.text }]}>
+                  {text}
+                </Text>
+              ) : (
+                <Text style={[styles.placeholderText, { color: mutedText }]}>
+                  Tap letters to start building a message.
+                </Text>
+              )}
+            </Pressable>
           </ScrollView>
 
           <View style={styles.rightColumn}>
@@ -355,6 +418,13 @@ const styles = StyleSheet.create({
   },
   textContainerContent: {
     paddingBottom: 4,
+  },
+  displayPressable: {
+    width: '100%',
+    paddingVertical: 4,
+  },
+  displayPressableActive: {
+    opacity: 0.85,
   },
   displayText: {
     fontSize: 34,
