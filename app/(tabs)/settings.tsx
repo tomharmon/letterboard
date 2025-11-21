@@ -28,6 +28,9 @@ export default function SettingsScreen() {
   const handleEmailPress = () => {
     Linking.openURL('mailto:tom@harmon.tech');
   };
+  const handlePrivacyPolicyPress = () => {
+    Linking.openURL('https://github.com/tomharmon/letterboard/blob/main/PRIVACY-POLICY.md');
+  };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.background }]}>
@@ -118,6 +121,29 @@ export default function SettingsScreen() {
         </View>
 
         <View style={[styles.card, { backgroundColor: surface, borderColor }]}>
+          <Text style={[styles.cardTitle, { color: palette.text }]}>Privacy</Text>
+          <Text style={[styles.privacyBody, { color: mutedText }]}>
+            We collect zero user data. All preferences are stored locally on your device and never
+            leave your device.
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Open privacy policy"
+            onPress={handlePrivacyPolicyPress}
+            style={({ pressed }) => [
+              styles.privacyButton,
+              {
+                borderColor: palette.tint,
+                opacity: pressed ? 0.7 : 1,
+              },
+            ]}
+          >
+            <MaterialCommunityIcons name="shield-check-outline" size={18} color={palette.tint} />
+            <Text style={[styles.privacyButtonText, { color: palette.tint }]}>View privacy policy</Text>
+          </Pressable>
+        </View>
+
+        <View style={[styles.card, { backgroundColor: surface, borderColor }]}>
           <Text style={[styles.cardTitle, { color: palette.text }]}>Bug reports & feedback</Text>
           <Text style={[styles.cardSubtitle, { color: mutedText }]}>
             Encountering a bug or have a feature request? We&apos;d love to hear from you!
@@ -186,6 +212,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
+  privacyBody: {
+    fontSize: 15,
+    lineHeight: 20,
+  },
   optionGroup: {
     gap: 10,
   },
@@ -246,6 +276,21 @@ const styles = StyleSheet.create({
   },
   emailButtonText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  privacyButton: {
+    marginTop: 8,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'flex-start',
+  },
+  privacyButtonText: {
     fontSize: 16,
     fontWeight: '600',
   },
