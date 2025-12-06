@@ -13,6 +13,9 @@
       "bundleIdentifier": "com.harmontech.myvoice",
       "requireFullScreen": true,
       "infoPlist": {
+        "UIDeviceFamily": [
+          2
+        ],
         "ITSAppUsesNonExemptEncryption": false,
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": false
