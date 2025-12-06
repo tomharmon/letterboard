@@ -19,8 +19,8 @@ type KeyboardLayoutContextValue = {
   setIncludePunctuation: (value: boolean) => void;
 };
 
-const LAYOUT_STORAGE_KEY = 'spelling-board.keyboardLayout';
-const PUNCTUATION_STORAGE_KEY = 'spelling-board.includePunctuation';
+const LAYOUT_STORAGE_KEY = 'myvoice.keyboardLayout';
+const PUNCTUATION_STORAGE_KEY = 'myvoice.includePunctuation';
 
 const KeyboardLayoutContext = createContext<KeyboardLayoutContextValue | undefined>(undefined);
 

@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "Spelling Board",
-    "slug": "spelling-board",
+    "name": "MyVoice",
+    "slug": "myvoice",
     "version": "1.0.0",
     "orientation": "landscape",
     "icon": "./assets/images/icon.png",
-    "scheme": "spellingboard",
+    "scheme": "myvoice",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.harmontech.spellingboard",
+      "bundleIdentifier": "com.harmontech.myvoice",
       "requireFullScreen": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -40,7 +40,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.harmontech.spellingboard"
+      "package": "com.harmontech.myvoice"
     },
     "web": {
       "output": "static",
