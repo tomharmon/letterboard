@@ -48,3 +48,51 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+# App Store Description
+
+MyVoice is a simple, respectful communication tool for iPad, built for Beyond Verbal folks who use text-to-speech to share their voice.
+
+  
+
+Type what you want to say, speak it aloud, and communicate your way, with multiple input styles designed to fit different moments, needs, and preferences.
+
+  
+
+Core Features:
+
+  
+
+- Communicate with the keyboard you prefer
+
+a. QWERTY layout for familiar typing
+
+b. Letterboard layout for focused, intentional selection
+
+c. Optional punctuation keys (toggle-able in Settings)
+
+- Tools that make everyday use easier
+
+a. Copy to Clipboard to paste messages anywhere
+
+b. Safe Clear to help prevent accidental deletion when you’re not done yet
+
+- More ways to express yourself
+
+a. Multiple Choice Board for quick responses and common selections
+
+b. Emoji Board for fast, expressive communication without extra typing
+
+- Completely free and open source.
+
+  
+
+Built with care, and improving over time
+
+  
+
+MyVoice is actively evolving. More features and refinements are planned, and **all feedback is welcome**. Please reach out to us with feature requests, accessibility notes, layout preferences, anything that helps make communication smoother.
+
+  
+
+Download MyVoice and make your iPad a dependable voice on your terms.
